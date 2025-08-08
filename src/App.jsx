@@ -12,6 +12,22 @@ function App() {
   const [loading, setLoading] = useState(false)
   const [telegramUsername, setTelegramUsername] = useState('')
   const [currentUUID, setCurrentUUID] = useState('')
+  
+  // Estados para autenticação avançada
+  const [showRegister, setShowRegister] = useState(false)
+  const [showForgotPassword, setShowForgotPassword] = useState(false)
+  const [registerForm, setRegisterForm] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    password: '',
+    confirmPassword: ''
+  })
+  const [verificationStep, setVerificationStep] = useState('')
+  const [verificationCodes, setVerificationCodes] = useState({
+    email: '',
+    sms: ''
+  })
 
   // Verificar se já está logado
   useEffect(() => {
@@ -42,6 +58,61 @@ function App() {
     } else {
       setLoginError('Credenciais inválidas. Tente novamente.')
     }
+  }
+
+  // Função de cadastro
+  const handleRegister = async (e) => {
+    e.preventDefault()
+    
+    if (registerForm.password !== registerForm.confirmPassword) {
+      alert('As senhas não coincidem!')
+      return
+    }
+    
+    if (registerForm.password.length < 8) {
+      alert('A senha deve ter pelo menos 8 caracteres!')
+      return
+    }
+    
+    try {
+      // Simular envio de códigos de verificação
+      setVerificationStep('codes')
+      alert('Códigos de verificação enviados para seu e-mail e celular!')
+    } catch (error) {
+      alert('Erro ao criar conta. Tente novamente.')
+    }
+  }
+
+  // Função para verificar códigos
+  const handleVerification = async (e) => {
+    e.preventDefault()
+    
+    if (verificationCodes.email === '123456' && verificationCodes.sms === '654321') {
+      alert('Conta criada com sucesso!')
+      setShowRegister(false)
+      setVerificationStep('')
+      setRegisterForm({
+        name: '',
+        email: '',
+        phone: '',
+        password: '',
+        confirmPassword: ''
+      })
+      setVerificationCodes({ email: '', sms: '' })
+    } else {
+      alert('Códigos inválidos. Tente novamente.')
+    }
+  }
+
+  // Função para Google OAuth (simulada)
+  const handleGoogleLogin = () => {
+    alert('Integração com Google em desenvolvimento. Use as credenciais de admin por enquanto.')
+  }
+
+  // Função para recuperação de senha
+  const handleForgotPassword = () => {
+    alert('Funcionalidade de recuperação de senha em desenvolvimento.')
+    setShowForgotPassword(false)
   }
 
   // Função de logout
@@ -516,33 +587,336 @@ ${signal.analysis}
 
           <div style={{
             textAlign: 'center',
-            marginTop: '2rem',
-            padding: '1rem',
-            background: '#0F172A',
-            borderRadius: '8px',
-            border: '1px solid #334155'
+            marginTop: '1.5rem'
           }}>
-            <p style={{
-              color: '#94A3B8',
-              fontSize: '0.75rem',
-              margin: '0 0 0.5rem 0'
+            <button 
+              onClick={handleGoogleLogin}
+              style={{
+                background: '#4285F4',
+                color: 'white',
+                border: 'none',
+                padding: '0.75rem 1.5rem',
+                borderRadius: '6px',
+                fontSize: '0.875rem',
+                fontWeight: '500',
+                cursor: 'pointer',
+                width: '100%',
+                marginBottom: '1rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.5rem'
+              }}>
+              🔗 Entrar via Google
+            </button>
+            
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              fontSize: '0.875rem'
             }}>
-              Credenciais de Teste:
-            </p>
-            <p style={{
-              color: '#58DAB3',
-              fontSize: '0.75rem',
-              margin: 0,
-              fontFamily: 'monospace'
-            }}>
-              admin@nexocrypto.app<br/>
-              NexoCrypto2025!@#
-            </p>
+              <button 
+                onClick={() => setShowRegister(true)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#58DAB3',
+                  cursor: 'pointer',
+                  textDecoration: 'underline'
+                }}>
+                Cadastrar
+              </button>
+              <button 
+                onClick={() => setShowForgotPassword(true)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#58DAB3',
+                  cursor: 'pointer',
+                  textDecoration: 'underline'
+                }}>
+                Esqueci minha senha
+              </button>
+            </div>
           </div>
         </div>
       </div>
     )
-  }
+
+  // Componente de Cadastro
+  const renderRegister = () => (
+    <div style={{
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #334155 100%)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '1rem'
+    }}>
+      <div style={{
+        background: 'rgba(15, 23, 42, 0.95)',
+        padding: '2rem',
+        borderRadius: '12px',
+        border: '1px solid #334155',
+        backdropFilter: 'blur(10px)',
+        width: '100%',
+        maxWidth: '400px'
+      }}>
+        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+          <h1 style={{
+            color: '#58DAB3',
+            fontSize: '1.5rem',
+            fontWeight: 'bold',
+            margin: '0 0 0.5rem 0'
+          }}>
+            Criar Conta
+          </h1>
+          <p style={{
+            color: '#94A3B8',
+            fontSize: '0.875rem',
+            margin: 0
+          }}>
+            Junte-se à plataforma de trading mais avançada
+          </p>
+        </div>
+
+        <form onSubmit={verificationStep === 'codes' ? handleVerification : handleRegister}>
+          {verificationStep === 'codes' ? (
+            // Tela de verificação de códigos
+            <>
+              <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+                <h2 style={{
+                  color: '#58DAB3',
+                  fontSize: '1.25rem',
+                  margin: '0 0 0.5rem 0'
+                }}>
+                  Verificação de Códigos
+                </h2>
+                <p style={{
+                  color: '#94A3B8',
+                  fontSize: '0.875rem',
+                  margin: 0
+                }}>
+                  Digite os códigos enviados para seu e-mail e celular
+                </p>
+              </div>
+
+              <div style={{ marginBottom: '1rem' }}>
+                <label style={{
+                  color: '#94A3B8',
+                  fontSize: '0.875rem',
+                  display: 'block',
+                  marginBottom: '0.5rem'
+                }}>
+                  Código do E-mail (123456)
+                </label>
+                <input
+                  type="text"
+                  placeholder="000000"
+                  value={verificationCodes.email}
+                  onChange={(e) => setVerificationCodes({...verificationCodes, email: e.target.value})}
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem',
+                    background: '#1E293B',
+                    border: '1px solid #334155',
+                    borderRadius: '6px',
+                    color: '#F8FAFC',
+                    fontSize: '0.875rem',
+                    textAlign: 'center',
+                    letterSpacing: '0.2rem'
+                  }}
+                  maxLength="6"
+                  required
+                />
+              </div>
+
+              <div style={{ marginBottom: '1.5rem' }}>
+                <label style={{
+                  color: '#94A3B8',
+                  fontSize: '0.875rem',
+                  display: 'block',
+                  marginBottom: '0.5rem'
+                }}>
+                  Código do SMS (654321)
+                </label>
+                <input
+                  type="text"
+                  placeholder="000000"
+                  value={verificationCodes.sms}
+                  onChange={(e) => setVerificationCodes({...verificationCodes, sms: e.target.value})}
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem',
+                    background: '#1E293B',
+                    border: '1px solid #334155',
+                    borderRadius: '6px',
+                    color: '#F8FAFC',
+                    fontSize: '0.875rem',
+                    textAlign: 'center',
+                    letterSpacing: '0.2rem'
+                  }}
+                  maxLength="6"
+                  required
+                />
+              </div>
+
+              <button
+                type="submit"
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  background: 'linear-gradient(135deg, #58DAB3 0%, #4ADE80 100%)',
+                  color: '#065F46',
+                  border: 'none',
+                  borderRadius: '6px',
+                  fontSize: '0.875rem',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  marginBottom: '1rem'
+                }}
+              >
+                Verificar Códigos
+              </button>
+            </>
+          ) : (
+            // Tela de cadastro normal
+            <>
+              <div style={{ marginBottom: '1rem' }}>
+                <input
+                  type="text"
+                  placeholder="Nome completo"
+                  value={registerForm.name}
+                  onChange={(e) => setRegisterForm({...registerForm, name: e.target.value})}
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem',
+                    background: '#1E293B',
+                    border: '1px solid #334155',
+                    borderRadius: '6px',
+                    color: '#F8FAFC',
+                    fontSize: '0.875rem'
+                  }}
+                  required
+                />
+              </div>
+
+              <div style={{ marginBottom: '1rem' }}>
+                <input
+                  type="email"
+                  placeholder="E-mail"
+                  value={registerForm.email}
+                  onChange={(e) => setRegisterForm({...registerForm, email: e.target.value})}
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem',
+                    background: '#1E293B',
+                    border: '1px solid #334155',
+                    borderRadius: '6px',
+                    color: '#F8FAFC',
+                    fontSize: '0.875rem'
+                  }}
+                  required
+                />
+              </div>
+
+              <div style={{ marginBottom: '1rem' }}>
+                <input
+                  type="tel"
+                  placeholder="Celular (11) 99999-9999"
+                  value={registerForm.phone}
+                  onChange={(e) => setRegisterForm({...registerForm, phone: e.target.value})}
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem',
+                    background: '#1E293B',
+                    border: '1px solid #334155',
+                    borderRadius: '6px',
+                    color: '#F8FAFC',
+                    fontSize: '0.875rem'
+                  }}
+                  required
+                />
+              </div>
+
+              <div style={{ marginBottom: '1rem' }}>
+                <input
+                  type="password"
+                  placeholder="Senha"
+                  value={registerForm.password}
+                  onChange={(e) => setRegisterForm({...registerForm, password: e.target.value})}
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem',
+                    background: '#1E293B',
+                    border: '1px solid #334155',
+                    borderRadius: '6px',
+                    color: '#F8FAFC',
+                    fontSize: '0.875rem'
+                  }}
+                  required
+                />
+              </div>
+
+              <div style={{ marginBottom: '1.5rem' }}>
+                <input
+                  type="password"
+                  placeholder="Confirmar senha"
+                  value={registerForm.confirmPassword}
+                  onChange={(e) => setRegisterForm({...registerForm, confirmPassword: e.target.value})}
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem',
+                    background: '#1E293B',
+                    border: '1px solid #334155',
+                    borderRadius: '6px',
+                    color: '#F8FAFC',
+                    fontSize: '0.875rem'
+                  }}
+                  required
+                />
+              </div>
+
+              <button
+                type="submit"
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  background: 'linear-gradient(135deg, #58DAB3 0%, #4ADE80 100%)',
+                  color: '#065F46',
+                  border: 'none',
+                  borderRadius: '6px',
+                  fontSize: '0.875rem',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  marginBottom: '1rem'
+                }}
+              >
+                Criar Conta
+              </button>
+            </>
+          )}
+
+          <button
+            type="button"
+            onClick={() => setShowRegister(false)}
+            style={{
+              width: '100%',
+              padding: '0.75rem',
+              background: 'transparent',
+              color: '#94A3B8',
+              border: '1px solid #334155',
+              borderRadius: '6px',
+              fontSize: '0.875rem',
+              cursor: 'pointer'
+            }}
+          >
+            Voltar ao Login
+          </button>
+        </form>
+      </div>
+    </div>
+  )
 
   // Dashboard principal (após login)
   const renderDashboard = () => (
@@ -1592,6 +1966,14 @@ ${signal.analysis}
       </div>
     </div>
   )
+
+  // Renderização principal
+  if (!isAuthenticated) {
+    if (showRegister) {
+      return renderRegister()
+    }
+    return renderLogin()
+  }
 
   return (
     <div style={{

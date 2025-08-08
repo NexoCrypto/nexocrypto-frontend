@@ -53,6 +53,9 @@ function App() {
 
   // Função para gerar novo UUID
   const generateNewUUID = async () => {
+    // Sempre limpa username primeiro (funciona como desconectar)
+    setTelegramUsername('')
+    
     try {
       const response = await fetch('https://nexocrypto-backend.onrender.com/api/telegram/generate-uuid', {
         method: 'POST',
@@ -64,8 +67,6 @@ function App() {
       if (response.ok) {
         const data = await response.json()
         setCurrentUUID(data.uuid)
-        // Limpa username anterior quando gera novo UUID
-        setTelegramUsername('')
       }
     } catch (error) {
       console.error('Erro ao gerar UUID:', error)
@@ -73,6 +74,9 @@ function App() {
       const fallbackUUID = `CRP-${Math.random().toString(36).substr(2, 8).toUpperCase()}-${Math.random().toString(36).substr(2, 4).toUpperCase()}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`
       setCurrentUUID(fallbackUUID)
     }
+    
+    // Mostra alerta de desconexão
+    alert('Novo UUID gerado! Telegram desconectado. Use o novo UUID para reconectar.')
   }
 
   // Função para desconectar Telegram
@@ -1394,7 +1398,7 @@ ${signal.analysis}
               fontWeight: '600',
               cursor: 'pointer'
             }}>
-              🔄 Gerar Novo
+              🔄 Gerar Novo / Desconectar
             </button>
           </div>
         </div>

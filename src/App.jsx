@@ -1,12 +1,53 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import './App.css'
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [loginForm, setLoginForm] = useState({ username: '', password: '' })
+  const [loginError, setLoginError] = useState('')
   const [activeTab, setActiveTab] = useState('dashboard')
   const [signals, setSignals] = useState([])
   const [gems, setGems] = useState([])
   const [news, setNews] = useState([])
   const [loading, setLoading] = useState(false)
+
+  // Verificar se já está logado
+  useEffect(() => {
+    const token = localStorage.getItem('nexocrypto_token')
+    if (token) {
+      setIsAuthenticated(true)
+    }
+  }, [])
+
+  // Credenciais de admin
+  const adminCredentials = [
+    { username: 'admin@nexocrypto.app', password: 'NexoCrypto2025!@#' },
+    { username: 'nexoadmin', password: 'Crypto@Admin123' }
+  ]
+
+  // Função de login
+  const handleLogin = (e) => {
+    e.preventDefault()
+    setLoginError('')
+
+    const isValid = adminCredentials.some(
+      cred => cred.username === loginForm.username && cred.password === loginForm.password
+    )
+
+    if (isValid) {
+      localStorage.setItem('nexocrypto_token', 'authenticated')
+      setIsAuthenticated(true)
+    } else {
+      setLoginError('Credenciais inválidas. Tente novamente.')
+    }
+  }
+
+  // Função de logout
+  const handleLogout = () => {
+    localStorage.removeItem('nexocrypto_token')
+    setIsAuthenticated(false)
+    setLoginForm({ username: '', password: '' })
+  }
 
   // Dados atualizados com preços reais de 07/08/2025
   const mockSignals = [
@@ -49,36 +90,36 @@ function App() {
       confidence: 85,
       timeframe: "4H",
       status: "active",
-      created: "07/08/2025 - 21:45",
-      analysis: "SOL mantém força com +4% hoje. Ecosystem em expansão contínua."
+      created: "07/08/2025 - 22:00",
+      analysis: "SOL em breakout de triângulo ascendente. Ecossistema DeFi em expansão."
     },
     {
       id: 4,
       pair: "ADAUSDT",
       direction: "LONG",
       entry: 0.42,
-      currentPrice: 0.418,
-      targets: [0.48, 0.55, 0.65],
+      currentPrice: 0.4185,
+      targets: [0.48, 0.52, 0.58],
       stopLoss: 0.38,
-      confidence: 76,
-      timeframe: "1D",
+      confidence: 78,
+      timeframe: "4H",
       status: "active",
-      created: "07/08/2025 - 21:30",
-      analysis: "ADA em acumulação. Smart contracts e estrutura resiliente atraindo investidores."
+      created: "07/08/2025 - 21:45",
+      analysis: "ADA rompendo resistência de $0.42. Upgrade Hydra gerando expectativa."
     },
     {
       id: 5,
       pair: "GALAUSDT",
       direction: "LONG",
       entry: 0.026,
-      currentPrice: 0.0258,
-      targets: [0.035, 0.045, 0.065],
+      currentPrice: 0.02615,
+      targets: [0.032, 0.038, 0.045],
       stopLoss: 0.022,
-      confidence: 78,
+      confidence: 74,
       timeframe: "4H",
       status: "active",
-      created: "07/08/2025 - 20:45",
-      analysis: "GALA gaming sector em alta. Partnerships fortes e baixo market cap."
+      created: "07/08/2025 - 21:30",
+      analysis: "GALA Games lançando novos títulos. Gaming crypto em recuperação."
     }
   ]
 
@@ -86,330 +127,636 @@ function App() {
     {
       id: 1,
       name: "Bitcoin Hyper",
-      symbol: "HYPER",
-      price: 0.003,
-      marketCap: "15M",
-      stars: 5,
+      symbol: "BTHYP",
+      rating: 5,
       potential: "1000%+",
       category: "Layer-2",
-      description: "Layer 2 para Bitcoin em presale. Projeto alinhado com crescimento do ecossistema BTC."
+      price: "$0.0045",
+      description: "Layer-2 do Bitcoin em presale. Backing de grandes VCs.",
+      risk: "Alto",
+      timeframe: "3-6 meses"
     },
     {
       id: 2,
       name: "Biconomy",
-      symbol: "BICO", 
-      price: 0.28,
-      marketCap: "180M",
-      stars: 4,
-      potential: "500-800%",
+      symbol: "BICO",
+      rating: 4,
+      potential: "400-600%",
       category: "Web3",
-      description: "Infraestrutura Web3 com backing da Coinbase. Target $5+ segundo análises."
+      price: "$0.28",
+      description: "Infraestrutura Web3 com backing da Coinbase Ventures.",
+      risk: "Médio",
+      timeframe: "6-12 meses"
     },
     {
       id: 3,
       name: "Space ID",
       symbol: "ID",
-      price: 0.45,
-      marketCap: "320M", 
-      stars: 4,
+      rating: 4,
       potential: "300-600%",
       category: "Identity",
-      description: "Plataforma de identidade descentralizada com aplicações no mundo real."
+      price: "$0.42",
+      description: "Protocolo de identidade descentralizada multi-chain.",
+      risk: "Médio",
+      timeframe: "6-12 meses"
     },
     {
       id: 4,
       name: "GALA Games",
       symbol: "GALA",
-      price: 0.026,
-      marketCap: "800M",
-      stars: 4,
+      rating: 4,
       potential: "200-400%",
       category: "Gaming",
-      description: "Líder no setor gaming com partnerships sólidas e crescimento do GameFi."
+      price: "$0.026",
+      description: "Líder em gaming blockchain com múltiplos jogos.",
+      risk: "Médio",
+      timeframe: "3-9 meses"
     },
     {
       id: 5,
       name: "Supra",
       symbol: "SUPRA",
-      price: 0.47,
-      marketCap: "450M",
-      stars: 4,
+      rating: 4,
       potential: "150-300%",
       category: "Oracle",
-      description: "Rede Oracle inovadora com integração DeFi crescente e baixo supply circulante."
+      price: "$0.089",
+      description: "Oracle de nova geração com tecnologia inovadora.",
+      risk: "Médio-Alto",
+      timeframe: "6-18 meses"
     },
     {
       id: 6,
       name: "Aergo",
       symbol: "AERGO",
-      price: 0.08,
-      marketCap: "50M",
-      stars: 3,
+      rating: 3,
       potential: "250-500%",
       category: "Enterprise",
-      description: "Blockchain empresarial com backing coreano (Samsung). Fase de acumulação."
+      price: "$0.095",
+      description: "Blockchain enterprise com parceria Samsung.",
+      risk: "Alto",
+      timeframe: "12-24 meses"
     }
   ]
+
   const mockNews = [
     {
       id: 1,
-      title: "Mercado crypto estabiliza em $3.7T enquanto traders rotacionam para micro-caps",
-      prediction: "Consolidação em $3.6-3.8T, foco em altcoins pequenas",
-      source: "market_analysis",
-      impact: "NEUTRAL",
-      severity: 6.5,
-      timestamp: "07/08/2025 - 22:00"
+      title: "SEC aprova resgates in-kind para ETFs de Bitcoin",
+      impact: "BULLISH",
+      score: 8.5,
+      timestamp: "07/08/2025 - 22:45",
+      description: "Decisão histórica facilita operações institucionais com Bitcoin.",
+      source: "SEC Official"
     },
     {
       id: 2,
-      title: "SEC aprova resgates in-kind para ETFs de Bitcoin e Ethereum",
-      prediction: "+3% a +8% em 24-48h para BTC/ETH",
-      source: "regulatory",
+      title: "Empresas públicas acumulam $2.1B em Ethereum",
       impact: "BULLISH", 
-      severity: 8.5,
-      timestamp: "06/08/2025 - 23:30"
+      score: 7.8,
+      timestamp: "07/08/2025 - 22:30",
+      description: "MicroStrategy e Tesla lideram compras institucionais de ETH.",
+      source: "Bloomberg"
     },
     {
       id: 3,
-      title: "Empresas públicas pequenas acumulam Ethereum em nova corrida do ouro crypto",
-      prediction: "+5% a +12% para ETH em 1-3 dias",
-      source: "institutional_buying",
+      title: "Trump facilita crypto em planos 401(k)",
       impact: "BULLISH",
-      severity: 7.8,
-      timestamp: "06/08/2025 - 21:15"
+      score: 7.2,
+      timestamp: "07/08/2025 - 22:15",
+      description: "Nova regulamentação permite crypto em aposentadorias.",
+      source: "Reuters"
     },
     {
       id: 4,
-      title: "Trump assina ordem executiva facilitando ativos privados em 401(k)s",
-      prediction: "+2% a +6% mercado geral em 2-5 dias",
-      source: "political",
-      impact: "BULLISH",
-      severity: 7.2,
-      timestamp: "07/08/2025 - 21:45"
+      title: "Bitcoin ETFs registram $812M em saídas",
+      impact: "BEARISH",
+      score: 6.8,
+      timestamp: "07/08/2025 - 22:00",
+      description: "Primeira semana negativa após 8 semanas de entradas.",
+      source: "CoinShares"
     },
     {
       id: 5,
-      title: "Bitcoin ETFs registram $812M em saídas lideradas por Fidelity e ARK",
-      prediction: "Pressão vendedora temporária, -2% a -5%",
-      source: "etf_flows",
-      impact: "BEARISH",
-      severity: 6.8,
-      timestamp: "06/08/2025 - 19:30"
+      title: "PlanB: Bitcoin novo ATH mensal confirmado",
+      impact: "BULLISH",
+      score: 8.2,
+      timestamp: "07/08/2025 - 21:45",
+      description: "Modelo Stock-to-Flow indica continuação da alta.",
+      source: "PlanB Twitter"
     },
     {
       id: 6,
-      title: "PlanB atualiza previsão: Bitcoin fecha julho em novo ATH mensal",
-      prediction: "Continuação da tendência, +8% a +15% próximas semanas",
-      source: "technical_analysis",
-      impact: "BULLISH",
-      severity: 8.2,
-      timestamp: "06/08/2025 - 17:20"
+      title: "Mercado crypto estabiliza em $3.7T",
+      impact: "NEUTRAL",
+      score: 6.5,
+      timestamp: "07/08/2025 - 21:30",
+      description: "Consolidação após rally de janeiro. Altcoins em acumulação.",
+      source: "CoinGecko"
     }
   ]
 
-  useEffect(() => {
-    setSignals(mockSignals)
-    setGems(mockGems)
-    setNews(mockNews)
-  }, [])
+  // Função de compartilhamento
+  const shareSignal = (signal, platform) => {
+    const message = `🚀 Sinal NexoCrypto
+    
+📊 ${signal.pair} ${signal.direction}
+💰 Entrada: $${signal.entry}
+🎯 Alvos: $${signal.targets.join(' | $')}
+🛡️ Stop: $${signal.stopLoss}
+⚡ Confiança: ${signal.confidence}%
 
+${signal.analysis}
+
+#NexoCrypto #Trading #Crypto`
+
+    const urls = {
+      telegram: `https://t.me/share/url?url=${encodeURIComponent('https://nexocrypto.app')}&text=${encodeURIComponent(message)}`,
+      whatsapp: `https://wa.me/?text=${encodeURIComponent(message)}`,
+      email: `mailto:?subject=Sinal NexoCrypto - ${signal.pair}&body=${encodeURIComponent(message)}`
+    }
+
+    window.open(urls[platform], '_blank')
+  }
+
+  // Página de Login
+  if (!isAuthenticated) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #0F172A 0%, #1E293B 100%)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontFamily: 'Inter, system-ui, sans-serif'
+      }}>
+        <div style={{
+          background: '#1E293B',
+          padding: '3rem',
+          borderRadius: '16px',
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+          border: '1px solid #334155',
+          width: '100%',
+          maxWidth: '400px'
+        }}>
+          <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+            <h1 style={{
+              color: '#58DAB3',
+              fontSize: '2.5rem',
+              fontWeight: 'bold',
+              margin: '0 0 0.5rem 0'
+            }}>
+              NexoCrypto
+            </h1>
+            <p style={{
+              color: '#94A3B8',
+              fontSize: '1rem',
+              margin: 0
+            }}>
+              Sistema Avançado de Trading
+            </p>
+          </div>
+
+          <form onSubmit={handleLogin}>
+            <div style={{ marginBottom: '1.5rem' }}>
+              <label style={{
+                display: 'block',
+                color: '#F8FAFC',
+                fontSize: '0.875rem',
+                fontWeight: '500',
+                marginBottom: '0.5rem'
+              }}>
+                Usuário
+              </label>
+              <input
+                type="text"
+                value={loginForm.username}
+                onChange={(e) => setLoginForm({...loginForm, username: e.target.value})}
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  background: '#0F172A',
+                  border: '1px solid #334155',
+                  borderRadius: '8px',
+                  color: '#F8FAFC',
+                  fontSize: '1rem',
+                  outline: 'none',
+                  transition: 'border-color 0.2s'
+                }}
+                onFocus={(e) => e.target.style.borderColor = '#58DAB3'}
+                onBlur={(e) => e.target.style.borderColor = '#334155'}
+                required
+              />
+            </div>
+
+            <div style={{ marginBottom: '1.5rem' }}>
+              <label style={{
+                display: 'block',
+                color: '#F8FAFC',
+                fontSize: '0.875rem',
+                fontWeight: '500',
+                marginBottom: '0.5rem'
+              }}>
+                Senha
+              </label>
+              <input
+                type="password"
+                value={loginForm.password}
+                onChange={(e) => setLoginForm({...loginForm, password: e.target.value})}
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  background: '#0F172A',
+                  border: '1px solid #334155',
+                  borderRadius: '8px',
+                  color: '#F8FAFC',
+                  fontSize: '1rem',
+                  outline: 'none',
+                  transition: 'border-color 0.2s'
+                }}
+                onFocus={(e) => e.target.style.borderColor = '#58DAB3'}
+                onBlur={(e) => e.target.style.borderColor = '#334155'}
+                required
+              />
+            </div>
+
+            {loginError && (
+              <div style={{
+                background: '#FEE2E2',
+                border: '1px solid #FECACA',
+                color: '#DC2626',
+                padding: '0.75rem',
+                borderRadius: '8px',
+                fontSize: '0.875rem',
+                marginBottom: '1.5rem'
+              }}>
+                {loginError}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              style={{
+                width: '100%',
+                background: 'linear-gradient(135deg, #58DAB3 0%, #4ADE80 100%)',
+                color: '#0F172A',
+                padding: '0.875rem',
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '1rem',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: 'transform 0.2s, box-shadow 0.2s'
+              }}
+              onMouseOver={(e) => {
+                e.target.style.transform = 'translateY(-1px)'
+                e.target.style.boxShadow = '0 10px 25px -5px rgba(88, 218, 179, 0.4)'
+              }}
+              onMouseOut={(e) => {
+                e.target.style.transform = 'translateY(0)'
+                e.target.style.boxShadow = 'none'
+              }}
+            >
+              Entrar
+            </button>
+          </form>
+
+          <div style={{
+            textAlign: 'center',
+            marginTop: '2rem',
+            padding: '1rem',
+            background: '#0F172A',
+            borderRadius: '8px',
+            border: '1px solid #334155'
+          }}>
+            <p style={{
+              color: '#94A3B8',
+              fontSize: '0.75rem',
+              margin: '0 0 0.5rem 0'
+            }}>
+              Credenciais de Teste:
+            </p>
+            <p style={{
+              color: '#58DAB3',
+              fontSize: '0.75rem',
+              margin: 0,
+              fontFamily: 'monospace'
+            }}>
+              admin@nexocrypto.app<br/>
+              NexoCrypto2025!@#
+            </p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Dashboard principal (após login)
   const renderDashboard = () => (
-    <div className="space-y-8">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white/10 backdrop-blur-md rounded-lg p-6 border border-white/20">
-          <h3 className="text-lg font-semibold text-white mb-2">Sinais Ativos</h3>
-          <p className="text-3xl font-bold text-green-400">{signals.length}</p>
-          <p className="text-sm text-gray-300">+2 nas últimas 24h</p>
+    <div style={{ padding: '2rem' }}>
+      <div style={{ 
+        display: 'grid', 
+        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
+        gap: '1.5rem',
+        marginBottom: '2rem'
+      }}>
+        <div style={{
+          background: 'linear-gradient(135deg, #1E293B 0%, #334155 100%)',
+          padding: '1.5rem',
+          borderRadius: '12px',
+          border: '1px solid #475569',
+          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.3)'
+        }}>
+          <h3 style={{ color: '#58DAB3', margin: '0 0 0.5rem 0', fontSize: '1.125rem' }}>Sinais Ativos</h3>
+          <p style={{ color: '#F8FAFC', fontSize: '2rem', fontWeight: 'bold', margin: 0 }}>5</p>
+          <p style={{ color: '#4ADE80', fontSize: '0.875rem', margin: '0.5rem 0 0 0' }}>+2 nas últimas 24h</p>
         </div>
         
-        <div className="bg-white/10 backdrop-blur-md rounded-lg p-6 border border-white/20">
-          <h3 className="text-lg font-semibold text-white mb-2">Taxa de Sucesso</h3>
-          <p className="text-3xl font-bold text-blue-400">89%</p>
-          <p className="text-sm text-gray-300">Últimos 30 dias</p>
+        <div style={{
+          background: 'linear-gradient(135deg, #1E293B 0%, #334155 100%)',
+          padding: '1.5rem',
+          borderRadius: '12px',
+          border: '1px solid #475569',
+          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.3)'
+        }}>
+          <h3 style={{ color: '#58DAB3', margin: '0 0 0.5rem 0', fontSize: '1.125rem' }}>Taxa de Sucesso</h3>
+          <p style={{ color: '#F8FAFC', fontSize: '2rem', fontWeight: 'bold', margin: 0 }}>89%</p>
+          <p style={{ color: '#4ADE80', fontSize: '0.875rem', margin: '0.5rem 0 0 0' }}>últimos 30 dias</p>
         </div>
         
-        <div className="bg-white/10 backdrop-blur-md rounded-lg p-6 border border-white/20">
-          <h3 className="text-lg font-semibold text-white mb-2">ROI Médio</h3>
-          <p className="text-3xl font-bold text-purple-400">+28.3%</p>
-          <p className="text-sm text-gray-300">Por trade</p>
+        <div style={{
+          background: 'linear-gradient(135deg, #1E293B 0%, #334155 100%)',
+          padding: '1.5rem',
+          borderRadius: '12px',
+          border: '1px solid #475569',
+          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.3)'
+        }}>
+          <h3 style={{ color: '#58DAB3', margin: '0 0 0.5rem 0', fontSize: '1.125rem' }}>ROI Médio</h3>
+          <p style={{ color: '#F8FAFC', fontSize: '2rem', fontWeight: 'bold', margin: 0 }}>+28.3%</p>
+          <p style={{ color: '#4ADE80', fontSize: '0.875rem', margin: '0.5rem 0 0 0' }}>por trade</p>
         </div>
         
-        <div className="bg-white/10 backdrop-blur-md rounded-lg p-6 border border-white/20">
-          <h3 className="text-lg font-semibold text-white mb-2">Gems Encontradas</h3>
-          <p className="text-3xl font-bold text-yellow-400">{gems.length}</p>
-          <p className="text-sm text-gray-300">Esta semana</p>
+        <div style={{
+          background: 'linear-gradient(135deg, #1E293B 0%, #334155 100%)',
+          padding: '1.5rem',
+          borderRadius: '12px',
+          border: '1px solid #475569',
+          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.3)'
+        }}>
+          <h3 style={{ color: '#58DAB3', margin: '0 0 0.5rem 0', fontSize: '1.125rem' }}>Gems Encontradas</h3>
+          <p style={{ color: '#F8FAFC', fontSize: '2rem', fontWeight: 'bold', margin: 0 }}>6</p>
+          <p style={{ color: '#4ADE80', fontSize: '0.875rem', margin: '0.5rem 0 0 0' }}>esta semana</p>
         </div>
       </div>
 
-      <div className="bg-white/10 backdrop-blur-md rounded-lg p-6 border border-white/20">
-        <h2 className="text-2xl font-bold text-white mb-4">Sistema Funcionando</h2>
-        <div className="space-y-4">
-          <div className="flex items-center justify-between p-4 bg-green-500/20 rounded-lg">
-            <div>
-              <h3 className="font-semibold text-white">✅ Backend Flask</h3>
-              <p className="text-gray-300">Servidor rodando na porta 5000</p>
+      <div style={{
+        background: 'linear-gradient(135deg, #1E293B 0%, #334155 100%)',
+        padding: '1.5rem',
+        borderRadius: '12px',
+        border: '1px solid #475569',
+        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.3)'
+      }}>
+        <h3 style={{ color: '#58DAB3', margin: '0 0 1rem 0', fontSize: '1.25rem' }}>Funcionalidades</h3>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+          {[
+            { name: 'Sinais de Trading', status: 'PRONTO', color: '#4ADE80' },
+            { name: 'Análise de Gems', status: 'PRONTO', color: '#4ADE80' },
+            { name: 'Monitoramento de Notícias', status: 'PRONTO', color: '#4ADE80' },
+            { name: 'Auto Trading', status: 'PRONTO', color: '#4ADE80' },
+            { name: 'Copy Trading', status: 'PRONTO', color: '#4ADE80' },
+            { name: 'Cursos', status: 'PRONTO', color: '#4ADE80' }
+          ].map((feature, index) => (
+            <div key={index} style={{
+              background: '#0F172A',
+              padding: '1rem',
+              borderRadius: '8px',
+              border: '1px solid #334155',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <span style={{ color: '#F8FAFC', fontSize: '0.875rem' }}>{feature.name}</span>
+              <span style={{
+                color: feature.color,
+                fontSize: '0.75rem',
+                fontWeight: '600',
+                background: `${feature.color}20`,
+                padding: '0.25rem 0.5rem',
+                borderRadius: '4px'
+              }}>
+                {feature.status}
+              </span>
             </div>
-            <span className="text-green-400 font-bold">ONLINE</span>
-          </div>
-          
-          <div className="flex items-center justify-between p-4 bg-green-500/20 rounded-lg">
-            <div>
-              <h3 className="font-semibold text-white">✅ Frontend React</h3>
-              <p className="text-gray-300">Interface rodando na porta 8080</p>
-            </div>
-            <span className="text-green-400 font-bold">ONLINE</span>
-          </div>
-          
-          <div className="flex items-center justify-between p-4 bg-blue-500/20 rounded-lg">
-            <div>
-              <h3 className="font-semibold text-white">🚀 Funcionalidades</h3>
-              <p className="text-gray-300">Sinais, Gems, Notícias, Cursos, Auto Trading, Copy Trading</p>
-            </div>
-            <span className="text-blue-400 font-bold">PRONTO</span>
-          </div>
+          ))}
         </div>
       </div>
     </div>
   )
 
   const renderSignals = () => (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-white">Sinais de Trading</h2>
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-        {signals.map((signal) => (
-          <div key={signal.id} className="bg-white/10 backdrop-blur-md rounded-lg p-6 border border-white/20">
-            <div className="flex justify-between items-start mb-4">
-              <div>
-                <h3 className="text-xl font-bold text-white">{signal.pair}</h3>
-                <span className={`px-2 py-1 rounded text-sm font-medium ${
-                  signal.direction === 'LONG' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
-                }`}>
-                  {signal.direction}
-                </span>
-              </div>
-              <div className="text-right">
-                <div className="text-sm text-gray-400">Confiança</div>
-                <div className="text-lg font-bold text-blue-400">{signal.confidence}%</div>
-              </div>
-            </div>
-            
-            <div className="space-y-3">
-              <div>
-                <div className="text-sm text-gray-400">Entrada</div>
-                <div className="text-white font-medium">${signal.entry.toLocaleString()}</div>
-              </div>
-              
-              <div>
-                <div className="text-sm text-gray-400">Preço Atual</div>
-                <div className={`font-medium ${
-                  signal.currentPrice >= signal.entry ? 'text-green-400' : 'text-red-400'
-                }`}>
-                  ${signal.currentPrice.toLocaleString()}
+    <div style={{ padding: '2rem' }}>
+      <h2 style={{ color: '#58DAB3', marginBottom: '1.5rem', fontSize: '1.5rem' }}>📈 Sinais de Trading</h2>
+      <div style={{ display: 'grid', gap: '1.5rem' }}>
+        {mockSignals.map(signal => {
+          const priceChange = signal.currentPrice - signal.entry
+          const priceChangePercent = ((priceChange / signal.entry) * 100).toFixed(2)
+          const isProfit = priceChange > 0
+
+          return (
+            <div key={signal.id} style={{
+              background: 'linear-gradient(135deg, #1E293B 0%, #334155 100%)',
+              padding: '1.5rem',
+              borderRadius: '12px',
+              border: '1px solid #475569',
+              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.3)'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+                <div>
+                  <h3 style={{ color: '#F8FAFC', margin: '0 0 0.5rem 0', fontSize: '1.25rem' }}>
+                    {signal.pair} {signal.direction}
+                  </h3>
+                  <p style={{ color: '#94A3B8', margin: 0, fontSize: '0.875rem' }}>
+                    {signal.created} • {signal.timeframe}
+                  </p>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <div style={{
+                    background: signal.direction === 'LONG' ? '#10B981' : '#EF4444',
+                    color: 'white',
+                    padding: '0.25rem 0.75rem',
+                    borderRadius: '20px',
+                    fontSize: '0.75rem',
+                    fontWeight: '600',
+                    marginBottom: '0.5rem'
+                  }}>
+                    {signal.direction}
+                  </div>
+                  <div style={{
+                    background: '#58DAB3',
+                    color: '#0F172A',
+                    padding: '0.25rem 0.75rem',
+                    borderRadius: '20px',
+                    fontSize: '0.75rem',
+                    fontWeight: '600'
+                  }}>
+                    {signal.confidence}% confiança
+                  </div>
                 </div>
               </div>
-              
-              <div>
-                <div className="text-sm text-gray-400">Targets</div>
-                <div className="flex space-x-2">
-                  {signal.targets.map((target, i) => (
-                    <span key={i} className="text-green-400 text-sm">
-                      TP{i+1}: ${target.toLocaleString()}
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem', marginBottom: '1rem' }}>
+                <div>
+                  <p style={{ color: '#94A3B8', margin: '0 0 0.25rem 0', fontSize: '0.75rem' }}>Entrada</p>
+                  <p style={{ color: '#F8FAFC', margin: 0, fontSize: '1rem', fontWeight: '600' }}>${signal.entry.toLocaleString()}</p>
+                </div>
+                <div>
+                  <p style={{ color: '#94A3B8', margin: '0 0 0.25rem 0', fontSize: '0.75rem' }}>Preço Atual</p>
+                  <p style={{ 
+                    color: isProfit ? '#4ADE80' : '#F87171', 
+                    margin: 0, 
+                    fontSize: '1rem', 
+                    fontWeight: '600' 
+                  }}>
+                    ${signal.currentPrice.toLocaleString()} 
+                    <span style={{ fontSize: '0.75rem', marginLeft: '0.5rem' }}>
+                      ({isProfit ? '+' : ''}{priceChangePercent}%)
                     </span>
-                  ))}
+                  </p>
+                </div>
+                <div>
+                  <p style={{ color: '#94A3B8', margin: '0 0 0.25rem 0', fontSize: '0.75rem' }}>Alvos</p>
+                  <p style={{ color: '#4ADE80', margin: 0, fontSize: '0.875rem' }}>
+                    ${signal.targets.join(' | $')}
+                  </p>
+                </div>
+                <div>
+                  <p style={{ color: '#94A3B8', margin: '0 0 0.25rem 0', fontSize: '0.75rem' }}>Stop Loss</p>
+                  <p style={{ color: '#F87171', margin: 0, fontSize: '0.875rem' }}>${signal.stopLoss.toLocaleString()}</p>
                 </div>
               </div>
-              
-              <div>
-                <div className="text-sm text-gray-400">Stop Loss</div>
-                <div className="text-red-400 font-medium">${signal.stopLoss.toLocaleString()}</div>
+
+              <div style={{
+                background: '#0F172A',
+                padding: '1rem',
+                borderRadius: '8px',
+                border: '1px solid #334155',
+                marginBottom: '1rem'
+              }}>
+                <p style={{ color: '#94A3B8', margin: '0 0 0.5rem 0', fontSize: '0.75rem' }}>Análise</p>
+                <p style={{ color: '#F8FAFC', margin: 0, fontSize: '0.875rem', lineHeight: '1.5' }}>
+                  {signal.analysis}
+                </p>
               </div>
-              
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-400">Timeframe: {signal.timeframe}</span>
-                <span className="text-gray-400">{signal.created}</span>
-              </div>
-              
-              {signal.analysis && (
-                <div className="mt-3 p-3 bg-blue-500/10 rounded-lg border border-blue-500/20">
-                  <div className="text-xs text-blue-400 mb-1">Análise:</div>
-                  <div className="text-sm text-gray-300">{signal.analysis}</div>
-                </div>
-              )}
-              
-              <div className="mt-4 pt-3 border-t border-white/10">
-                <div className="text-xs text-gray-400 mb-2">Compartilhar:</div>
-                <div className="flex space-x-2">
-                  <button
-                    onClick={() => shareSignal(signal, 'telegram')}
-                    className="flex-1 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 px-3 py-2 rounded text-xs font-medium transition-colors"
-                  >
-                    📱 Telegram
-                  </button>
-                  <button
-                    onClick={() => shareSignal(signal, 'whatsapp')}
-                    className="flex-1 bg-green-500/20 hover:bg-green-500/30 text-green-400 px-3 py-2 rounded text-xs font-medium transition-colors"
-                  >
-                    💬 WhatsApp
-                  </button>
-                  <button
-                    onClick={() => shareSignal(signal, 'email')}
-                    className="flex-1 bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 px-3 py-2 rounded text-xs font-medium transition-colors"
-                  >
-                    ✉️ Email
-                  </button>
-                </div>
+
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <button
+                  onClick={() => shareSignal(signal, 'telegram')}
+                  style={{
+                    background: '#0088CC',
+                    color: 'white',
+                    border: 'none',
+                    padding: '0.5rem 1rem',
+                    borderRadius: '6px',
+                    fontSize: '0.75rem',
+                    cursor: 'pointer',
+                    fontWeight: '500'
+                  }}
+                >
+                  📱 Telegram
+                </button>
+                <button
+                  onClick={() => shareSignal(signal, 'whatsapp')}
+                  style={{
+                    background: '#25D366',
+                    color: 'white',
+                    border: 'none',
+                    padding: '0.5rem 1rem',
+                    borderRadius: '6px',
+                    fontSize: '0.75rem',
+                    cursor: 'pointer',
+                    fontWeight: '500'
+                  }}
+                >
+                  💬 WhatsApp
+                </button>
+                <button
+                  onClick={() => shareSignal(signal, 'email')}
+                  style={{
+                    background: '#6B7280',
+                    color: 'white',
+                    border: 'none',
+                    padding: '0.5rem 1rem',
+                    borderRadius: '6px',
+                    fontSize: '0.75rem',
+                    cursor: 'pointer',
+                    fontWeight: '500'
+                  }}
+                >
+                  ✉️ Email
+                </button>
               </div>
             </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
     </div>
   )
 
   const renderGems = () => (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-white">Gems Descobertas</h2>
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-        {gems.map((gem) => (
-          <div key={gem.id} className="bg-white/10 backdrop-blur-md rounded-lg p-6 border border-white/20">
-            <div className="flex justify-between items-start mb-4">
+    <div style={{ padding: '2rem' }}>
+      <h2 style={{ color: '#58DAB3', marginBottom: '1.5rem', fontSize: '1.5rem' }}>💎 Gems Descobertas</h2>
+      <div style={{ display: 'grid', gap: '1.5rem' }}>
+        {mockGems.map(gem => (
+          <div key={gem.id} style={{
+            background: 'linear-gradient(135deg, #1E293B 0%, #334155 100%)',
+            padding: '1.5rem',
+            borderRadius: '12px',
+            border: '1px solid #475569',
+            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.3)'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
               <div>
-                <h3 className="text-xl font-bold text-white">{gem.name}</h3>
-                <div className="text-gray-400">{gem.symbol}</div>
-              </div>
-              <div className="flex">
-                {[...Array(5)].map((_, i) => (
-                  <span key={i} className={`text-lg ${i < gem.stars ? 'text-yellow-400' : 'text-gray-600'}`}>
-                    ⭐
+                <h3 style={{ color: '#F8FAFC', margin: '0 0 0.5rem 0', fontSize: '1.25rem' }}>
+                  {gem.name} ({gem.symbol})
+                </h3>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <div style={{ color: '#FCD34D' }}>
+                    {'⭐'.repeat(gem.rating)}
+                  </div>
+                  <span style={{ color: '#94A3B8', fontSize: '0.875rem' }}>
+                    {gem.category}
                   </span>
-                ))}
+                </div>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <p style={{ color: '#58DAB3', margin: '0 0 0.25rem 0', fontSize: '1.125rem', fontWeight: '600' }}>
+                  {gem.price}
+                </p>
+                <p style={{ color: '#4ADE80', margin: 0, fontSize: '0.875rem', fontWeight: '600' }}>
+                  {gem.potential}
+                </p>
               </div>
             </div>
-            
-            <div className="space-y-3">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <div className="text-sm text-gray-400">Preço</div>
-                  <div className="text-white font-medium">${gem.price}</div>
-                </div>
-                <div>
-                  <div className="text-sm text-gray-400">Market Cap</div>
-                  <div className="text-white font-medium">{gem.marketCap}</div>
-                </div>
-              </div>
-              
+
+            <p style={{ color: '#F8FAFC', margin: '0 0 1rem 0', fontSize: '0.875rem', lineHeight: '1.5' }}>
+              {gem.description}
+            </p>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '1rem' }}>
               <div>
-                <div className="text-sm text-gray-400">Potencial</div>
-                <div className="text-green-400 font-bold">{gem.potential}</div>
+                <p style={{ color: '#94A3B8', margin: '0 0 0.25rem 0', fontSize: '0.75rem' }}>Risco</p>
+                <p style={{ 
+                  color: gem.risk === 'Alto' ? '#F87171' : gem.risk === 'Médio' ? '#FCD34D' : '#4ADE80', 
+                  margin: 0, 
+                  fontSize: '0.875rem',
+                  fontWeight: '600'
+                }}>
+                  {gem.risk}
+                </p>
               </div>
-              
               <div>
-                <span className="px-2 py-1 bg-purple-500/20 text-purple-400 rounded text-sm">
-                  {gem.category}
-                </span>
+                <p style={{ color: '#94A3B8', margin: '0 0 0.25rem 0', fontSize: '0.75rem' }}>Timeframe</p>
+                <p style={{ color: '#F8FAFC', margin: 0, fontSize: '0.875rem' }}>{gem.timeframe}</p>
               </div>
-              
-              <div className="text-sm text-gray-300">{gem.description}</div>
             </div>
           </div>
         ))}
@@ -418,35 +765,56 @@ function App() {
   )
 
   const renderNews = () => (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-white">Monitoramento de Notícias</h2>
-      <div className="space-y-4">
-        {news.map((item) => (
-          <div key={item.id} className="bg-white/10 backdrop-blur-md rounded-lg p-6 border border-white/20">
-            <div className="flex justify-between items-start mb-3">
-              <h3 className="text-lg font-bold text-white">{item.title}</h3>
-              <div className="flex items-center space-x-2">
-                <span className={`px-2 py-1 rounded text-sm font-medium ${
-                  item.impact === 'BULLISH' ? 'bg-green-500/20 text-green-400' : 
-                  item.impact === 'BEARISH' ? 'bg-red-500/20 text-red-400' :
-                  'bg-gray-500/20 text-gray-400'
-                }`}>
-                  {item.impact}
-                </span>
-                <span className="text-yellow-400 font-bold">{item.severity}/10</span>
+    <div style={{ padding: '2rem' }}>
+      <h2 style={{ color: '#58DAB3', marginBottom: '1.5rem', fontSize: '1.5rem' }}>📰 Monitoramento de Notícias</h2>
+      <div style={{ display: 'grid', gap: '1rem' }}>
+        {mockNews.map(news => (
+          <div key={news.id} style={{
+            background: 'linear-gradient(135deg, #1E293B 0%, #334155 100%)',
+            padding: '1.5rem',
+            borderRadius: '12px',
+            border: '1px solid #475569',
+            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.3)'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
+              <h3 style={{ color: '#F8FAFC', margin: 0, fontSize: '1.125rem', lineHeight: '1.4', flex: 1 }}>
+                {news.title}
+              </h3>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginLeft: '1rem' }}>
+                <div style={{
+                  background: news.impact === 'BULLISH' ? '#10B981' : news.impact === 'BEARISH' ? '#EF4444' : '#6B7280',
+                  color: 'white',
+                  padding: '0.25rem 0.75rem',
+                  borderRadius: '20px',
+                  fontSize: '0.75rem',
+                  fontWeight: '600'
+                }}>
+                  {news.impact}
+                </div>
+                <div style={{
+                  background: '#58DAB3',
+                  color: '#0F172A',
+                  padding: '0.25rem 0.75rem',
+                  borderRadius: '20px',
+                  fontSize: '0.75rem',
+                  fontWeight: '600'
+                }}>
+                  {news.score}/10
+                </div>
               </div>
             </div>
             
-            <div className="space-y-2">
-              <p className="text-gray-300 text-sm">
-                <span className="font-medium">Predição:</span> {item.prediction}
-              </p>
-              <p className="text-gray-400 text-xs">
-                <span className="font-medium">Fonte:</span> {item.source}
-              </p>
-              <p className="text-gray-400 text-xs">
-                {item.timestamp}
-              </p>
+            <p style={{ color: '#94A3B8', margin: '0 0 0.75rem 0', fontSize: '0.875rem', lineHeight: '1.5' }}>
+              {news.description}
+            </p>
+            
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ color: '#58DAB3', fontSize: '0.75rem', fontWeight: '500' }}>
+                {news.source}
+              </span>
+              <span style={{ color: '#94A3B8', fontSize: '0.75rem' }}>
+                {news.timestamp}
+              </span>
             </div>
           </div>
         ))}
@@ -454,734 +822,770 @@ function App() {
     </div>
   )
 
-  // Função para compartilhar sinal
-  const shareSignal = (signal, platform) => {
-    const signalText = `🚀 SINAL CRYPTO - ${signal.pair}
-    
-📈 Direção: ${signal.direction}
-💰 Entrada: $${signal.entry.toLocaleString()}
-💰 Atual: $${signal.currentPrice.toLocaleString()}
-🎯 Targets: ${signal.targets.map((t, i) => `TP${i+1}: $${t.toLocaleString()}`).join(' | ')}
-🛑 Stop Loss: $${signal.stopLoss.toLocaleString()}
-📊 Confiança: ${signal.confidence}%
-⏰ ${signal.created}
-
-📊 NexoCrypto`
-
-    const encodedText = encodeURIComponent(signalText)
-    
-    switch(platform) {
-      case 'telegram':
-        window.open(`https://t.me/share/url?url=${encodedText}`, '_blank')
-        break
-      case 'whatsapp':
-        window.open(`https://wa.me/?text=${encodedText}`, '_blank')
-        break
-      case 'email':
-        window.open(`mailto:?subject=Sinal Crypto - ${signal.pair}&body=${encodedText}`, '_blank')
-        break
-    }
-  }
-
   const renderAutoTrading = () => (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-white">Auto Trading - Integração Telegram + ByBit</h2>
+    <div style={{ padding: '2rem' }}>
+      <h2 style={{ color: '#58DAB3', marginBottom: '1.5rem', fontSize: '1.5rem' }}>🤖 Auto Trading</h2>
       
-      {/* Status e Configurações */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Status do Bot */}
+      <div style={{
+        background: 'linear-gradient(135deg, #1E293B 0%, #334155 100%)',
+        padding: '1.5rem',
+        borderRadius: '12px',
+        border: '1px solid #475569',
+        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.3)',
+        marginBottom: '1.5rem'
+      }}>
+        <h3 style={{ color: '#58DAB3', margin: '0 0 1rem 0', fontSize: '1.25rem' }}>🎛️ Painel de Controle</h3>
         
-        {/* Painel de Controle */}
-        <div className="bg-white/10 backdrop-blur-md rounded-lg p-6 border border-white/20">
-          <h3 className="text-xl font-bold text-white mb-4">🎛️ Painel de Controle</h3>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
+          <div>
+            <label style={{ color: '#F8FAFC', fontSize: '0.875rem', display: 'block', marginBottom: '0.5rem' }}>
+              Status do Bot
+            </label>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <div style={{
+                width: '12px',
+                height: '12px',
+                borderRadius: '50%',
+                background: '#4ADE80'
+              }}></div>
+              <span style={{ color: '#4ADE80', fontSize: '0.875rem', fontWeight: '600' }}>ATIVO</span>
+            </div>
+          </div>
           
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Status do Bot</label>
-              <div className="flex items-center space-x-3">
-                <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-                <span className="text-green-400 font-medium">ATIVO</span>
-                <button className="ml-auto bg-red-500/20 hover:bg-red-500/30 text-red-400 px-3 py-1 rounded text-sm">
-                  Pausar
-                </button>
-              </div>
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Valor Máximo por Operação</label>
-              <div className="flex items-center space-x-2">
-                <input 
-                  type="number" 
-                  defaultValue="100"
-                  className="bg-white/10 border border-white/20 rounded px-3 py-2 text-white w-24"
-                />
-                <span className="text-gray-300">USDT</span>
-              </div>
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">% do Saldo por Trade</label>
-              <div className="flex items-center space-x-2">
-                <input 
-                  type="range" 
-                  min="1" 
-                  max="10" 
-                  defaultValue="2"
-                  className="flex-1"
-                />
-                <span className="text-white font-medium w-8">2%</span>
-              </div>
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Análise Automática</label>
-              <div className="flex items-center space-x-3">
-                <input type="checkbox" defaultChecked className="rounded" />
-                <span className="text-gray-300">Validar sinais antes de executar</span>
-              </div>
-            </div>
+          <div>
+            <label style={{ color: '#F8FAFC', fontSize: '0.875rem', display: 'block', marginBottom: '0.5rem' }}>
+              Valor Máximo por Operação
+            </label>
+            <input
+              type="number"
+              defaultValue="100"
+              style={{
+                background: '#0F172A',
+                border: '1px solid #334155',
+                borderRadius: '6px',
+                color: '#F8FAFC',
+                padding: '0.5rem',
+                fontSize: '0.875rem',
+                width: '100px'
+              }}
+            />
+            <span style={{ color: '#94A3B8', fontSize: '0.75rem', marginLeft: '0.5rem' }}>USDT</span>
           </div>
-        </div>
-        
-        {/* Grupos Conectados */}
-        <div className="bg-white/10 backdrop-blur-md rounded-lg p-6 border border-white/20">
-          <h3 className="text-xl font-bold text-white mb-4">📱 Grupos Telegram</h3>
           
-          <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 bg-green-500/20 rounded-lg">
-              <div>
-                <div className="font-medium text-white">Binance Killers</div>
-                <div className="text-sm text-gray-300">Conectado • 15 sinais hoje</div>
-              </div>
-              <div className="w-3 h-3 bg-green-400 rounded-full"></div>
-            </div>
-            
-            <div className="flex items-center justify-between p-3 bg-green-500/20 rounded-lg">
-              <div>
-                <div className="font-medium text-white">ByBit Pro</div>
-                <div className="text-sm text-gray-300">Conectado • 8 sinais hoje</div>
-              </div>
-              <div className="w-3 h-3 bg-green-400 rounded-full"></div>
-            </div>
-            
-            <div className="flex items-center justify-between p-3 bg-yellow-500/20 rounded-lg">
-              <div>
-                <div className="font-medium text-white">Raven Pro</div>
-                <div className="text-sm text-gray-300">Aguardando configuração</div>
-              </div>
-              <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
-            </div>
-            
-            <button className="w-full bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 py-2 rounded font-medium">
-              + Adicionar Grupo
-            </button>
+          <div>
+            <label style={{ color: '#F8FAFC', fontSize: '0.875rem', display: 'block', marginBottom: '0.5rem' }}>
+              % do Saldo por Trade
+            </label>
+            <input
+              type="range"
+              min="1"
+              max="10"
+              defaultValue="2"
+              style={{ width: '100%', marginBottom: '0.25rem' }}
+            />
+            <span style={{ color: '#58DAB3', fontSize: '0.75rem' }}>2%</span>
           </div>
-        </div>
-      </div>
-      
-      {/* Estatísticas e Histórico */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
-        {/* Estatísticas */}
-        <div className="bg-white/10 backdrop-blur-md rounded-lg p-6 border border-white/20">
-          <h3 className="text-lg font-bold text-white mb-4">📊 Estatísticas Hoje</h3>
-          <div className="space-y-3">
-            <div className="flex justify-between">
-              <span className="text-gray-300">Sinais Recebidos:</span>
-              <span className="text-white font-medium">23</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-300">Executados:</span>
-              <span className="text-green-400 font-medium">18</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-300">Rejeitados:</span>
-              <span className="text-red-400 font-medium">5</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-300">Taxa de Sucesso:</span>
-              <span className="text-blue-400 font-medium">83%</span>
-            </div>
-          </div>
-        </div>
-        
-        {/* Saldo ByBit */}
-        <div className="bg-white/10 backdrop-blur-md rounded-lg p-6 border border-white/20">
-          <h3 className="text-lg font-bold text-white mb-4">💰 Saldo ByBit</h3>
-          <div className="space-y-3">
-            <div className="flex justify-between">
-              <span className="text-gray-300">Saldo Total:</span>
-              <span className="text-white font-medium">2,450 USDT</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-300">Em Posições:</span>
-              <span className="text-yellow-400 font-medium">340 USDT</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-300">Disponível:</span>
-              <span className="text-green-400 font-medium">2,110 USDT</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-300">P&L Hoje:</span>
-              <span className="text-green-400 font-medium">+45.30 USDT</span>
-            </div>
-          </div>
-        </div>
-        
-        {/* Análise IA */}
-        <div className="bg-white/10 backdrop-blur-md rounded-lg p-6 border border-white/20">
-          <h3 className="text-lg font-bold text-white mb-4">🧠 Análise IA</h3>
-          <div className="space-y-3">
-            <div className="flex justify-between">
-              <span className="text-gray-300">Sinais Analisados:</span>
-              <span className="text-white font-medium">23</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-300">Aprovados:</span>
-              <span className="text-green-400 font-medium">18</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-300">Rejeitados:</span>
-              <span className="text-red-400 font-medium">5</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-300">Precisão IA:</span>
-              <span className="text-blue-400 font-medium">91%</span>
+          
+          <div>
+            <label style={{ color: '#F8FAFC', fontSize: '0.875rem', display: 'block', marginBottom: '0.5rem' }}>
+              Análise Automática
+            </label>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <input type="checkbox" defaultChecked style={{ accentColor: '#58DAB3' }} />
+              <span style={{ color: '#4ADE80', fontSize: '0.875rem' }}>✅ Validar sinais antes de executar</span>
             </div>
           </div>
         </div>
       </div>
-      
-      {/* Últimas Operações */}
-      <div className="bg-white/10 backdrop-blur-md rounded-lg p-6 border border-white/20">
-        <h3 className="text-xl font-bold text-white mb-4">📈 Últimas Operações</h3>
-        
-        <div className="space-y-3">
-          <div className="flex items-center justify-between p-3 bg-green-500/10 rounded-lg border border-green-500/20">
-            <div className="flex items-center space-x-3">
-              <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-              <div>
-                <div className="font-medium text-white">BTCUSDT LONG</div>
-                <div className="text-sm text-gray-300">Binance Killers • 13:45</div>
-              </div>
-            </div>
-            <div className="text-right">
-              <div className="text-green-400 font-medium">+2.3%</div>
-              <div className="text-sm text-gray-300">50 USDT</div>
-            </div>
-          </div>
-          
-          <div className="flex items-center justify-between p-3 bg-red-500/10 rounded-lg border border-red-500/20">
-            <div className="flex items-center space-x-3">
-              <div className="w-2 h-2 bg-red-400 rounded-full"></div>
-              <div>
-                <div className="font-medium text-white">ETHUSDT SHORT</div>
-                <div className="text-sm text-gray-300">ByBit Pro • 12:30</div>
-              </div>
-            </div>
-            <div className="text-right">
-              <div className="text-red-400 font-medium">-1.1%</div>
-              <div className="text-sm text-gray-300">75 USDT</div>
-            </div>
-          </div>
-          
-          <div className="flex items-center justify-between p-3 bg-yellow-500/10 rounded-lg border border-yellow-500/20">
-            <div className="flex items-center space-x-3">
-              <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
-              <div>
-                <div className="font-medium text-white">SOLUSDT LONG</div>
-                <div className="text-sm text-gray-300">Binance Killers • 11:15</div>
-              </div>
-            </div>
-            <div className="text-right">
-              <div className="text-yellow-400 font-medium">Em andamento</div>
-              <div className="text-sm text-gray-300">100 USDT</div>
-            </div>
-          </div>
-        </div>
-        
-        <button className="w-full mt-4 bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 py-2 rounded font-medium">
-          Ver Histórico Completo
-        </button>
-      </div>
-      
-        {/* Configurações Avançadas */}
-        <div className="bg-white/10 backdrop-blur-md rounded-lg p-6 border border-white/20">
-          <h3 className="text-xl font-bold text-white mb-4">⚙️ Configurações Avançadas</h3>
-          
-          {/* Validação Telegram */}
-          <div className="mb-6 p-4 bg-blue-500/10 rounded-lg border border-blue-500/20">
-            <h4 className="font-semibold text-white mb-3">🔐 Validação de Telegram</h4>
-            <div className="space-y-3">
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Status da Validação</label>
-                <div className="flex items-center space-x-3">
-                  <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
-                  <span className="text-yellow-400 font-medium">PENDENTE</span>
-                  <button className="ml-auto bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 px-3 py-1 rounded text-sm">
-                    Validar Agora
-                  </button>
-                </div>
-              </div>
-              
-              <div className="bg-gray-800/50 rounded-lg p-3">
-                <div className="text-sm text-gray-300 mb-2">Seu UUID de Validação:</div>
-                <div className="flex items-center space-x-2">
-                  <code className="bg-black/30 px-3 py-1 rounded text-green-400 font-mono text-sm flex-1">
-                    CRP-7A8B9C2D-E3F4-5G6H-I7J8-K9L0M1N2O3P4
-                  </code>
-                  <button className="bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 px-2 py-1 rounded text-xs">
-                    Copiar
-                  </button>
-                </div>
-              </div>
-              
-              <div className="text-xs text-gray-400 space-y-1">
-                <p>📋 <strong>Como validar:</strong></p>
-                <p>1. Envie o UUID acima para nosso bot: <code className="bg-black/30 px-1 rounded">@CryptoAnalyzerBot</code></p>
-                <p>2. Digite: <code className="bg-black/30 px-1 rounded">/validate CRP-7A8B9C2D-E3F4-5G6H-I7J8-K9L0M1N2O3P4</code></p>
-                <p>3. Aguarde confirmação e clique em "Validar Agora"</p>
-                <p>🔒 Isso garante que apenas você pode receber sinais neste Telegram</p>
-              </div>
-            </div>
-          </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-4">
-            <h4 className="font-semibold text-white">Gestão de Risco</h4>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Stop Loss Automático</label>
-              <div className="flex items-center space-x-2">
-                <input type="checkbox" defaultChecked className="rounded" />
-                <span className="text-gray-300">Ativar para todos os trades</span>
-              </div>
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Take Profit Parcial</label>
-              <div className="flex items-center space-x-2">
-                <input type="checkbox" defaultChecked className="rounded" />
-                <span className="text-gray-300">50% no TP1, 30% no TP2, 20% no TP3</span>
-              </div>
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Max Drawdown</label>
-              <div className="flex items-center space-x-2">
-                <input 
-                  type="number" 
-                  defaultValue="5"
-                  className="bg-white/10 border border-white/20 rounded px-3 py-2 text-white w-16"
-                />
-                <span className="text-gray-300">% - Pausar bot se atingir</span>
-              </div>
-            </div>
-          </div>
-          
-          <div className="space-y-4">
-            <h4 className="font-semibold text-white">Filtros de Sinais</h4>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Confiança Mínima</label>
-              <div className="flex items-center space-x-2">
-                <input 
-                  type="range" 
-                  min="50" 
-                  max="95" 
-                  defaultValue="75"
-                  className="flex-1"
-                />
-                <span className="text-white font-medium w-8">75%</span>
-              </div>
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Pares Permitidos</label>
-              <select 
-                defaultValue="todos"
-                className="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-white focus:border-blue-500 focus:outline-none"
-                style={{
-                  backgroundColor: '#1f2937',
-                  color: '#ffffff'
-                }}
-              >
-                <option value="todos" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>✅ Todos os Pares (353+ pares - Recomendado)</option>
-                
-                <optgroup label="🔥 Principais (10)" style={{backgroundColor: '#374151', color: '#ffffff', fontWeight: 'bold'}}>
-                  <option value="BTC/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>BTC/USDT</option>
-                  <option value="ETH/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>ETH/USDT</option>
-                  <option value="SOL/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>SOL/USDT</option>
-                  <option value="XRP/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>XRP/USDT</option>
-                  <option value="ADA/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>ADA/USDT</option>
-                  <option value="AVAX/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>AVAX/USDT</option>
-                  <option value="DOT/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>DOT/USDT</option>
-                  <option value="MATIC/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>MATIC/USDT</option>
-                  <option value="LINK/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>LINK/USDT</option>
-                  <option value="UNI/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>UNI/USDT</option>
-                </optgroup>
-                
-                <optgroup label="💎 Top 50 Altcoins (20)" style={{backgroundColor: '#374151', color: '#ffffff', fontWeight: 'bold'}}>
-                  <option value="LTC/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>LTC/USDT</option>
-                  <option value="BCH/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>BCH/USDT</option>
-                  <option value="ATOM/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>ATOM/USDT</option>
-                  <option value="FIL/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>FIL/USDT</option>
-                  <option value="ICP/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>ICP/USDT</option>
-                  <option value="NEAR/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>NEAR/USDT</option>
-                  <option value="ALGO/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>ALGO/USDT</option>
-                  <option value="VET/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>VET/USDT</option>
-                  <option value="HBAR/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>HBAR/USDT</option>
-                  <option value="EGLD/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>EGLD/USDT</option>
-                  <option value="FTM/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>FTM/USDT</option>
-                  <option value="ONE/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>ONE/USDT</option>
-                  <option value="THETA/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>THETA/USDT</option>
-                  <option value="XTZ/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>XTZ/USDT</option>
-                  <option value="EOS/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>EOS/USDT</option>
-                  <option value="TRX/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>TRX/USDT</option>
-                  <option value="XLM/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>XLM/USDT</option>
-                  <option value="KAVA/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>KAVA/USDT</option>
-                  <option value="ZIL/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>ZIL/USDT</option>
-                  <option value="BAT/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>BAT/USDT</option>
-                </optgroup>
-                
-                <optgroup label="🚀 DeFi & Yield (15)" style={{backgroundColor: '#374151', color: '#ffffff', fontWeight: 'bold'}}>
-                  <option value="AAVE/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>AAVE/USDT</option>
-                  <option value="COMP/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>COMP/USDT</option>
-                  <option value="SUSHI/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>SUSHI/USDT</option>
-                  <option value="CRV/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>CRV/USDT</option>
-                  <option value="YFI/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>YFI/USDT</option>
-                  <option value="SNX/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>SNX/USDT</option>
-                  <option value="MKR/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>MKR/USDT</option>
-                  <option value="RUNE/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>RUNE/USDT</option>
-                  <option value="CAKE/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>CAKE/USDT</option>
-                  <option value="ALPHA/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>ALPHA/USDT</option>
-                  <option value="LDO/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>LDO/USDT</option>
-                  <option value="RPL/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>RPL/USDT</option>
-                  <option value="CVX/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>CVX/USDT</option>
-                  <option value="BAL/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>BAL/USDT</option>
-                  <option value="AURA/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>AURA/USDT</option>
-                </optgroup>
-                
-                <optgroup label="⚡ Layer 2 & Scaling (10)" style={{backgroundColor: '#374151', color: '#ffffff', fontWeight: 'bold'}}>
-                  <option value="ARB/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>ARB/USDT</option>
-                  <option value="OP/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>OP/USDT</option>
-                  <option value="LRC/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>LRC/USDT</option>
-                  <option value="IMX/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>IMX/USDT</option>
-                  <option value="STRK/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>STRK/USDT</option>
-                  <option value="METIS/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>METIS/USDT</option>
-                  <option value="BOBA/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>BOBA/USDT</option>
-                  <option value="CELR/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>CELR/USDT</option>
-                  <option value="SYN/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>SYN/USDT</option>
-                  <option value="POLY/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>POLY/USDT</option>
-                </optgroup>
-                
-                <optgroup label="🎮 Gaming & NFT (15)" style={{backgroundColor: '#374151', color: '#ffffff', fontWeight: 'bold'}}>
-                  <option value="AXS/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>AXS/USDT</option>
-                  <option value="SAND/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>SAND/USDT</option>
-                  <option value="MANA/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>MANA/USDT</option>
-                  <option value="ENJ/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>ENJ/USDT</option>
-                  <option value="GALA/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>GALA/USDT</option>
-                  <option value="FLOW/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>FLOW/USDT</option>
-                  <option value="CHZ/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>CHZ/USDT</option>
-                  <option value="APE/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>APE/USDT</option>
-                  <option value="GMT/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>GMT/USDT</option>
-                  <option value="ILV/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>ILV/USDT</option>
-                  <option value="ALICE/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>ALICE/USDT</option>
-                  <option value="TLM/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>TLM/USDT</option>
-                  <option value="GHST/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>GHST/USDT</option>
-                  <option value="REVV/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>REVV/USDT</option>
-                  <option value="TOWER/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>TOWER/USDT</option>
-                </optgroup>
-                
-                <optgroup label="🔥 Meme Coins (13)" style={{backgroundColor: '#374151', color: '#ffffff', fontWeight: 'bold'}}>
-                  <option value="DOGE/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>DOGE/USDT</option>
-                  <option value="SHIB/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>SHIB/USDT</option>
-                  <option value="PEPE/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>PEPE/USDT</option>
-                  <option value="FLOKI/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>FLOKI/USDT</option>
-                  <option value="WIF/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>WIF/USDT</option>
-                  <option value="BOME/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>BOME/USDT</option>
-                  <option value="1000BONK/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>1000BONK/USDT</option>
-                  <option value="1000FLOKI/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>1000FLOKI/USDT</option>
-                  <option value="10000LADYS/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>10000LADYS/USDT</option>
-                  <option value="1000PEPE/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>1000PEPE/USDT</option>
-                  <option value="MEME/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>MEME/USDT</option>
-                  <option value="PEPE2/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>PEPE2/USDT</option>
-                  <option value="WEN/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>WEN/USDT</option>
-                </optgroup>
-                
-                <optgroup label="🤖 AI & Data (15)" style={{backgroundColor: '#374151', color: '#ffffff', fontWeight: 'bold'}}>
-                  <option value="TAO/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>TAO/USDT</option>
-                  <option value="FET/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>FET/USDT</option>
-                  <option value="AGIX/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>AGIX/USDT</option>
-                  <option value="OCEAN/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>OCEAN/USDT</option>
-                  <option value="GRT/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>GRT/USDT</option>
-                  <option value="RNDR/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>RNDR/USDT</option>
-                  <option value="WLD/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>WLD/USDT</option>
-                  <option value="AI/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>AI/USDT</option>
-                  <option value="ARKM/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>ARKM/USDT</option>
-                  <option value="PHB/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>PHB/USDT</option>
-                  <option value="ORAI/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>ORAI/USDT</option>
-                  <option value="BAND/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>BAND/USDT</option>
-                  <option value="TRB/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>TRB/USDT</option>
-                  <option value="API3/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>API3/USDT</option>
-                  <option value="FLUX/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>FLUX/USDT</option>
-                </optgroup>
-                
-                <optgroup label="🌟 Novos Listados (20)" style={{backgroundColor: '#374151', color: '#ffffff', fontWeight: 'bold'}}>
-                  <option value="SUI/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>SUI/USDT</option>
-                  <option value="APT/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>APT/USDT</option>
-                  <option value="BLUR/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>BLUR/USDT</option>
-                  <option value="ID/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>ID/USDT</option>
-                  <option value="RDNT/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>RDNT/USDT</option>
-                  <option value="GMX/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>GMX/USDT</option>
-                  <option value="MAGIC/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>MAGIC/USDT</option>
-                  <option value="GRAIL/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>GRAIL/USDT</option>
-                  <option value="JTO/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>JTO/USDT</option>
-                  <option value="PYTH/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>PYTH/USDT</option>
-                  <option value="ENA/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>ENA/USDT</option>
-                  <option value="OMNI/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>OMNI/USDT</option>
-                  <option value="REZ/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>REZ/USDT</option>
-                  <option value="IO/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>IO/USDT</option>
-                  <option value="ZK/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>ZK/USDT</option>
-                  <option value="LISTA/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>LISTA/USDT</option>
-                  <option value="ZRO/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>ZRO/USDT</option>
-                  <option value="G/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>G/USDT</option>
-                  <option value="BANANA/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>BANANA/USDT</option>
-                  <option value="TON/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>TON/USDT</option>
-                </optgroup>
-                
-                <optgroup label="🟠 Bitcoin Ecosystem (6)" style={{backgroundColor: '#374151', color: '#ffffff', fontWeight: 'bold'}}>
-                  <option value="BTC/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>BTC/USDT</option>
-                  <option value="ORDI/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>ORDI/USDT</option>
-                  <option value="SATS/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>SATS/USDT</option>
-                  <option value="RATS/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>RATS/USDT</option>
-                  <option value="1000SATS/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>1000SATS/USDT</option>
-                  <option value="MUBI/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>MUBI/USDT</option>
-                </optgroup>
-                
-                <optgroup label="🟣 Solana Ecosystem (10)" style={{backgroundColor: '#374151', color: '#ffffff', fontWeight: 'bold'}}>
-                  <option value="SOL/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>SOL/USDT</option>
-                  <option value="RAY/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>RAY/USDT</option>
-                  <option value="SRM/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>SRM/USDT</option>
-                  <option value="FIDA/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>FIDA/USDT</option>
-                  <option value="STEP/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>STEP/USDT</option>
-                  <option value="ATLAS/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>ATLAS/USDT</option>
-                  <option value="POLIS/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>POLIS/USDT</option>
-                  <option value="SAMO/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>SAMO/USDT</option>
-                  <option value="COPE/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>COPE/USDT</option>
-                  <option value="ROPE/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>ROPE/USDT</option>
-                </optgroup>
-                
-                <optgroup label="⚛️ Cosmos Ecosystem (10)" style={{backgroundColor: '#374151', color: '#ffffff', fontWeight: 'bold'}}>
-                  <option value="ATOM/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>ATOM/USDT</option>
-                  <option value="OSMO/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>OSMO/USDT</option>
-                  <option value="JUNO/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>JUNO/USDT</option>
-                  <option value="SCRT/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>SCRT/USDT</option>
-                  <option value="INJ/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>INJ/USDT</option>
-                  <option value="KUJI/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>KUJI/USDT</option>
-                  <option value="ROWAN/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>ROWAN/USDT</option>
-                  <option value="LUNA/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>LUNA/USDT</option>
-                  <option value="LUNC/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>LUNC/USDT</option>
-                  <option value="USTC/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>USTC/USDT</option>
-                </optgroup>
-                
-                <optgroup label="🔷 Arbitrum Ecosystem (10)" style={{backgroundColor: '#374151', color: '#ffffff', fontWeight: 'bold'}}>
-                  <option value="ARB/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>ARB/USDT</option>
-                  <option value="GMX/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>GMX/USDT</option>
-                  <option value="GNS/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>GNS/USDT</option>
-                  <option value="MAGIC/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>MAGIC/USDT</option>
-                  <option value="GRAIL/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>GRAIL/USDT</option>
-                  <option value="RDNT/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>RDNT/USDT</option>
-                  <option value="PENDLE/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>PENDLE/USDT</option>
-                  <option value="JONES/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>JONES/USDT</option>
-                  <option value="VELA/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>VELA/USDT</option>
-                  <option value="Y2K/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>Y2K/USDT</option>
-                </optgroup>
-                
-                <optgroup label="🟡 BNB Chain Ecosystem (10)" style={{backgroundColor: '#374151', color: '#ffffff', fontWeight: 'bold'}}>
-                  <option value="BNB/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>BNB/USDT</option>
-                  <option value="CAKE/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>CAKE/USDT</option>
-                  <option value="AUTO/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>AUTO/USDT</option>
-                  <option value="BIFI/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>BIFI/USDT</option>
-                  <option value="BELT/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>BELT/USDT</option>
-                  <option value="ALPACA/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>ALPACA/USDT</option>
-                  <option value="XVS/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>XVS/USDT</option>
-                  <option value="VAI/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>VAI/USDT</option>
-                  <option value="SXP/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>SXP/USDT</option>
-                  <option value="TWT/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>TWT/USDT</option>
-                </optgroup>
-                
-                <optgroup label="💰 Stablecoins & Exchange (10)" style={{backgroundColor: '#374151', color: '#ffffff', fontWeight: 'bold'}}>
-                  <option value="USDC/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>USDC/USDT</option>
-                  <option value="DAI/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>DAI/USDT</option>
-                  <option value="FRAX/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>FRAX/USDT</option>
-                  <option value="USDD/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>USDD/USDT</option>
-                  <option value="TUSD/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>TUSD/USDT</option>
-                  <option value="BNB/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>BNB/USDT</option>
-                  <option value="OKB/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>OKB/USDT</option>
-                  <option value="HT/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>HT/USDT</option>
-                  <option value="LEO/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>LEO/USDT</option>
-                  <option value="CRO/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>CRO/USDT</option>
-                </optgroup>
-                
-                <optgroup label="📊 Outros Populares (20)" style={{backgroundColor: '#374151', color: '#ffffff', fontWeight: 'bold'}}>
-                  <option value="ZRX/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>ZRX/USDT</option>
-                  <option value="1INCH/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>1INCH/USDT</option>
-                  <option value="DYDX/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>DYDX/USDT</option>
-                  <option value="PERP/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>PERP/USDT</option>
-                  <option value="MASK/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>MASK/USDT</option>
-                  <option value="AUDIO/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>AUDIO/USDT</option>
-                  <option value="STORJ/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>STORJ/USDT</option>
-                  <option value="KNC/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>KNC/USDT</option>
-                  <option value="REN/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>REN/USDT</option>
-                  <option value="C98/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>C98/USDT</option>
-                  <option value="JASMY/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>JASMY/USDT</option>
-                  <option value="ROSE/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>ROSE/USDT</option>
-                  <option value="BLZ/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>BLZ/USDT</option>
-                  <option value="REEF/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>REEF/USDT</option>
-                  <option value="ACH/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>ACH/USDT</option>
-                  <option value="CLV/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>CLV/USDT</option>
-                  <option value="YGG/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>YGG/USDT</option>
-                  <option value="FRONT/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>FRONT/USDT</option>
-                  <option value="SFP/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>SFP/USDT</option>
-                  <option value="1000XEC/USDT" style={{backgroundColor: '#1f2937', color: '#ffffff'}}>1000XEC/USDT</option>
-                </optgroup>
-              </select>
-              <p className="text-xs text-gray-400 mt-1">
-                💡 "Todos" permite trading em qualquer par USDT disponível na ByBit
-              </p>
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Horário de Operação</label>
-              <div className="flex items-center space-x-2">
-                <input 
-                  type="time" 
-                  defaultValue="09:00"
-                  className="bg-white/10 border border-white/20 rounded px-3 py-2 text-white"
-                />
-                <span className="text-gray-300">até</span>
-                <input 
-                  type="time" 
-                  defaultValue="18:00"
-                  className="bg-white/10 border border-white/20 rounded px-3 py-2 text-white"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div className="mt-6 pt-4 border-t border-white/10">
-          <div className="flex space-x-4">
-            <button className="bg-green-500/20 hover:bg-green-500/30 text-green-400 px-6 py-2 rounded font-medium">
-              Salvar Configurações
-            </button>
-            <button className="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 px-6 py-2 rounded font-medium">
-              Testar Conexão ByBit
-            </button>
-            <button className="bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 px-6 py-2 rounded font-medium">
-              Configurar API Keys
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
 
-  const renderCourses = () => (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-white">Cursos de Trading</h2>
-      <div className="bg-white/10 backdrop-blur-md rounded-lg p-8 border border-white/20 text-center">
-        <div className="mb-6">
-          <div className="text-6xl mb-4">🎓</div>
-          <h3 className="text-2xl font-bold text-white mb-2">Cursos em Desenvolvimento</h3>
-          <p className="text-gray-300 mb-6">
-            Estamos preparando cursos completos de análise técnica, gestão de risco e estratégias avançadas de trading.
-          </p>
+      {/* Grupos Telegram */}
+      <div style={{
+        background: 'linear-gradient(135deg, #1E293B 0%, #334155 100%)',
+        padding: '1.5rem',
+        borderRadius: '12px',
+        border: '1px solid #475569',
+        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.3)',
+        marginBottom: '1.5rem'
+      }}>
+        <h3 style={{ color: '#58DAB3', margin: '0 0 1rem 0', fontSize: '1.25rem' }}>📱 Grupos Telegram Conectados</h3>
+        
+        <div style={{ display: 'grid', gap: '0.75rem' }}>
+          {[
+            { name: 'Binance Killers', status: 'Conectado', signals: 15, color: '#4ADE80' },
+            { name: 'ByBit Pro', status: 'Conectado', signals: 8, color: '#4ADE80' },
+            { name: 'Raven Pro', status: 'Aguardando configuração', signals: 0, color: '#FCD34D' },
+            { name: 'Tasso', status: 'Aguardando configuração', signals: 0, color: '#FCD34D' }
+          ].map((group, index) => (
+            <div key={index} style={{
+              background: '#0F172A',
+              padding: '1rem',
+              borderRadius: '8px',
+              border: '1px solid #334155',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <div style={{
+                  width: '8px',
+                  height: '8px',
+                  borderRadius: '50%',
+                  background: group.color
+                }}></div>
+                <span style={{ color: '#F8FAFC', fontSize: '0.875rem', fontWeight: '500' }}>
+                  {group.name}
+                </span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <span style={{ color: '#94A3B8', fontSize: '0.75rem' }}>
+                  {group.signals} sinais hoje
+                </span>
+                <span style={{
+                  color: group.color,
+                  fontSize: '0.75rem',
+                  fontWeight: '600'
+                }}>
+                  {group.status}
+                </span>
+              </div>
+            </div>
+          ))}
+          
+          <button style={{
+            background: 'linear-gradient(135deg, #58DAB3 0%, #4ADE80 100%)',
+            color: '#0F172A',
+            border: 'none',
+            padding: '0.75rem',
+            borderRadius: '8px',
+            fontSize: '0.875rem',
+            fontWeight: '600',
+            cursor: 'pointer'
+          }}>
+            + Adicionar Grupo
+          </button>
+        </div>
+      </div>
+
+      {/* Estatísticas */}
+      <div style={{
+        background: 'linear-gradient(135deg, #1E293B 0%, #334155 100%)',
+        padding: '1.5rem',
+        borderRadius: '12px',
+        border: '1px solid #475569',
+        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.3)',
+        marginBottom: '1.5rem'
+      }}>
+        <h3 style={{ color: '#58DAB3', margin: '0 0 1rem 0', fontSize: '1.25rem' }}>📊 Estatísticas em Tempo Real</h3>
+        
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem', marginBottom: '1rem' }}>
+          <div style={{ textAlign: 'center' }}>
+            <p style={{ color: '#94A3B8', margin: '0 0 0.25rem 0', fontSize: '0.75rem' }}>Sinais Recebidos</p>
+            <p style={{ color: '#F8FAFC', margin: 0, fontSize: '1.5rem', fontWeight: 'bold' }}>23</p>
+          </div>
+          <div style={{ textAlign: 'center' }}>
+            <p style={{ color: '#94A3B8', margin: '0 0 0.25rem 0', fontSize: '0.75rem' }}>Executados</p>
+            <p style={{ color: '#4ADE80', margin: 0, fontSize: '1.5rem', fontWeight: 'bold' }}>18</p>
+          </div>
+          <div style={{ textAlign: 'center' }}>
+            <p style={{ color: '#94A3B8', margin: '0 0 0.25rem 0', fontSize: '0.75rem' }}>Rejeitados</p>
+            <p style={{ color: '#F87171', margin: 0, fontSize: '1.5rem', fontWeight: 'bold' }}>5</p>
+          </div>
+          <div style={{ textAlign: 'center' }}>
+            <p style={{ color: '#94A3B8', margin: '0 0 0.25rem 0', fontSize: '0.75rem' }}>Taxa de Sucesso</p>
+            <p style={{ color: '#58DAB3', margin: 0, fontSize: '1.5rem', fontWeight: 'bold' }}>83%</p>
+          </div>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div className="bg-purple-500/20 rounded-lg p-4">
-            <h4 className="font-semibold text-white mb-2">📊 Análise Técnica</h4>
-            <p className="text-sm text-gray-300">Indicadores, padrões e estratégias</p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem' }}>
+          <div style={{ textAlign: 'center' }}>
+            <p style={{ color: '#94A3B8', margin: '0 0 0.25rem 0', fontSize: '0.75rem' }}>Precisão IA</p>
+            <p style={{ color: '#58DAB3', margin: 0, fontSize: '1.5rem', fontWeight: 'bold' }}>91%</p>
           </div>
-          <div className="bg-blue-500/20 rounded-lg p-4">
-            <h4 className="font-semibold text-white mb-2">⚖️ Gestão de Risco</h4>
-            <p className="text-sm text-gray-300">Stop loss, take profit e position sizing</p>
+          <div style={{ textAlign: 'center' }}>
+            <p style={{ color: '#94A3B8', margin: '0 0 0.25rem 0', fontSize: '0.75rem' }}>Saldo ByBit</p>
+            <p style={{ color: '#F8FAFC', margin: 0, fontSize: '1.5rem', fontWeight: 'bold' }}>2,450</p>
+            <p style={{ color: '#94A3B8', margin: 0, fontSize: '0.75rem' }}>USDT</p>
           </div>
-          <div className="bg-green-500/20 rounded-lg p-4">
-            <h4 className="font-semibold text-white mb-2">🚀 Estratégias Avançadas</h4>
-            <p className="text-sm text-gray-300">Scalping, swing trade e long term</p>
+          <div style={{ textAlign: 'center' }}>
+            <p style={{ color: '#94A3B8', margin: '0 0 0.25rem 0', fontSize: '0.75rem' }}>P&L Hoje</p>
+            <p style={{ color: '#4ADE80', margin: 0, fontSize: '1.5rem', fontWeight: 'bold' }}>+45.30</p>
+            <p style={{ color: '#94A3B8', margin: 0, fontSize: '0.75rem' }}>USDT</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Últimas Operações */}
+      <div style={{
+        background: 'linear-gradient(135deg, #1E293B 0%, #334155 100%)',
+        padding: '1.5rem',
+        borderRadius: '12px',
+        border: '1px solid #475569',
+        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.3)',
+        marginBottom: '1.5rem'
+      }}>
+        <h3 style={{ color: '#58DAB3', margin: '0 0 1rem 0', fontSize: '1.25rem' }}>📈 Últimas Operações</h3>
+        
+        <div style={{ display: 'grid', gap: '0.75rem' }}>
+          {[
+            { pair: 'BTCUSDT', type: 'LONG', result: '+2.3%', source: 'Binance Killers', color: '#4ADE80' },
+            { pair: 'ETHUSDT', type: 'SHORT', result: '-1.1%', source: 'ByBit Pro', color: '#F87171' },
+            { pair: 'SOLUSDT', type: 'LONG', result: 'Em andamento', source: 'Binance Killers', color: '#FCD34D' }
+          ].map((trade, index) => (
+            <div key={index} style={{
+              background: '#0F172A',
+              padding: '1rem',
+              borderRadius: '8px',
+              border: '1px solid #334155',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <span style={{ color: '#F8FAFC', fontSize: '0.875rem', fontWeight: '600' }}>
+                  {trade.pair}
+                </span>
+                <span style={{
+                  background: trade.type === 'LONG' ? '#10B981' : '#EF4444',
+                  color: 'white',
+                  padding: '0.25rem 0.5rem',
+                  borderRadius: '4px',
+                  fontSize: '0.75rem',
+                  fontWeight: '600'
+                }}>
+                  {trade.type}
+                </span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <span style={{ color: '#94A3B8', fontSize: '0.75rem' }}>
+                  {trade.source}
+                </span>
+                <span style={{
+                  color: trade.color,
+                  fontSize: '0.875rem',
+                  fontWeight: '600'
+                }}>
+                  {trade.result}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Configurações Avançadas */}
+      <div style={{
+        background: 'linear-gradient(135deg, #1E293B 0%, #334155 100%)',
+        padding: '1.5rem',
+        borderRadius: '12px',
+        border: '1px solid #475569',
+        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.3)',
+        marginBottom: '1.5rem'
+      }}>
+        <h3 style={{ color: '#58DAB3', margin: '0 0 1rem 0', fontSize: '1.25rem' }}>⚙️ Configurações Avançadas</h3>
+        
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem' }}>
+          <div>
+            <label style={{ color: '#F8FAFC', fontSize: '0.875rem', display: 'block', marginBottom: '0.5rem' }}>
+              Stop Loss Automático
+            </label>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <input type="checkbox" defaultChecked style={{ accentColor: '#58DAB3' }} />
+              <span style={{ color: '#4ADE80', fontSize: '0.875rem' }}>✅ Para todos os trades</span>
+            </div>
+          </div>
+          
+          <div>
+            <label style={{ color: '#F8FAFC', fontSize: '0.875rem', display: 'block', marginBottom: '0.5rem' }}>
+              Take Profit Parcial
+            </label>
+            <span style={{ color: '#94A3B8', fontSize: '0.75rem' }}>50% TP1, 30% TP2, 20% TP3</span>
+          </div>
+          
+          <div>
+            <label style={{ color: '#F8FAFC', fontSize: '0.875rem', display: 'block', marginBottom: '0.5rem' }}>
+              Max Drawdown
+            </label>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <input
+                type="number"
+                defaultValue="5"
+                style={{
+                  background: '#0F172A',
+                  border: '1px solid #334155',
+                  borderRadius: '6px',
+                  color: '#F8FAFC',
+                  padding: '0.25rem',
+                  fontSize: '0.75rem',
+                  width: '60px'
+                }}
+              />
+              <span style={{ color: '#94A3B8', fontSize: '0.75rem' }}>% (pausar bot)</span>
+            </div>
+          </div>
+          
+          <div>
+            <label style={{ color: '#F8FAFC', fontSize: '0.875rem', display: 'block', marginBottom: '0.5rem' }}>
+              Confiança Mínima
+            </label>
+            <input
+              type="range"
+              min="50"
+              max="95"
+              defaultValue="75"
+              style={{ width: '100%', marginBottom: '0.25rem' }}
+            />
+            <span style={{ color: '#58DAB3', fontSize: '0.75rem' }}>75%</span>
           </div>
         </div>
         
-        <div className="bg-yellow-500/20 rounded-lg p-4">
-          <p className="text-yellow-400 font-medium">🚧 Em breve disponível para usuários ALPHA</p>
+        <div style={{ marginTop: '1rem' }}>
+          <label style={{ color: '#F8FAFC', fontSize: '0.875rem', display: 'block', marginBottom: '0.5rem' }}>
+            Pares Permitidos
+          </label>
+          <select style={{
+            background: '#0F172A',
+            border: '1px solid #334155',
+            borderRadius: '6px',
+            color: '#F8FAFC',
+            padding: '0.5rem',
+            fontSize: '0.875rem',
+            width: '100%',
+            maxWidth: '300px'
+          }}>
+            <option value="all">Todos os Pares (353+ pares - Recomendado)</option>
+            <optgroup label="🔥 Principais (10)">
+              <option value="BTCUSDT">BTC/USDT</option>
+              <option value="ETHUSDT">ETH/USDT</option>
+              <option value="SOLUSDT">SOL/USDT</option>
+              <option value="XRPUSDT">XRP/USDT</option>
+              <option value="ADAUSDT">ADA/USDT</option>
+            </optgroup>
+            <optgroup label="💎 Top 50 Altcoins (20)">
+              <option value="LTCUSDT">LTC/USDT</option>
+              <option value="BCHUSDT">BCH/USDT</option>
+              <option value="ATOMUSDT">ATOM/USDT</option>
+              <option value="FILUSDT">FIL/USDT</option>
+            </optgroup>
+            <optgroup label="🚀 DeFi & Yield (15)">
+              <option value="AAVEUSDT">AAVE/USDT</option>
+              <option value="COMPUSDT">COMP/USDT</option>
+              <option value="SUSHIUSDT">SUSHI/USDT</option>
+              <option value="CRVUSDT">CRV/USDT</option>
+            </optgroup>
+          </select>
         </div>
+        
+        <div style={{ marginTop: '1rem' }}>
+          <label style={{ color: '#F8FAFC', fontSize: '0.875rem', display: 'block', marginBottom: '0.5rem' }}>
+            Horário de Operação
+          </label>
+          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+            <input
+              type="time"
+              defaultValue="09:00"
+              style={{
+                background: '#0F172A',
+                border: '1px solid #334155',
+                borderRadius: '6px',
+                color: '#F8FAFC',
+                padding: '0.5rem',
+                fontSize: '0.875rem'
+              }}
+            />
+            <span style={{ color: '#94A3B8', fontSize: '0.875rem' }}>às</span>
+            <input
+              type="time"
+              defaultValue="18:00"
+              style={{
+                background: '#0F172A',
+                border: '1px solid #334155',
+                borderRadius: '6px',
+                color: '#F8FAFC',
+                padding: '0.5rem',
+                fontSize: '0.875rem'
+              }}
+            />
+            <span style={{ color: '#94A3B8', fontSize: '0.875rem' }}>(Brasília)</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Validação Telegram */}
+      <div style={{
+        background: 'linear-gradient(135deg, #1E293B 0%, #334155 100%)',
+        padding: '1.5rem',
+        borderRadius: '12px',
+        border: '1px solid #475569',
+        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.3)',
+        marginBottom: '1.5rem'
+      }}>
+        <h3 style={{ color: '#58DAB3', margin: '0 0 1rem 0', fontSize: '1.25rem' }}>🔐 Validação de Telegram</h3>
+        
+        <div style={{
+          background: '#0F172A',
+          padding: '1rem',
+          borderRadius: '8px',
+          border: '1px solid #334155',
+          marginBottom: '1rem'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+            <span style={{ color: '#F8FAFC', fontSize: '0.875rem', fontWeight: '500' }}>
+              UUID de Validação
+            </span>
+            <span style={{
+              background: '#FCD34D',
+              color: '#92400E',
+              padding: '0.25rem 0.75rem',
+              borderRadius: '20px',
+              fontSize: '0.75rem',
+              fontWeight: '600'
+            }}>
+              PENDENTE
+            </span>
+          </div>
+          
+          <div style={{
+            background: '#374151',
+            padding: '0.75rem',
+            borderRadius: '6px',
+            fontFamily: 'monospace',
+            fontSize: '0.875rem',
+            color: '#F8FAFC',
+            marginBottom: '0.75rem'
+          }}>
+            CRP-7A8B9C2D-E3F4-5G6H-I7J8-K9L0M1N2O3P4
+          </div>
+          
+          <button style={{
+            background: '#58DAB3',
+            color: '#0F172A',
+            border: 'none',
+            padding: '0.5rem 1rem',
+            borderRadius: '6px',
+            fontSize: '0.75rem',
+            fontWeight: '600',
+            cursor: 'pointer',
+            marginRight: '0.5rem'
+          }}>
+            📋 Copiar UUID
+          </button>
+        </div>
+        
+        <div style={{
+          background: '#1E40AF',
+          padding: '1rem',
+          borderRadius: '8px',
+          border: '1px solid #3B82F6'
+        }}>
+          <h4 style={{ color: '#DBEAFE', margin: '0 0 0.5rem 0', fontSize: '0.875rem', fontWeight: '600' }}>
+            📱 Como Validar:
+          </h4>
+          <ol style={{ color: '#DBEAFE', fontSize: '0.75rem', margin: 0, paddingLeft: '1rem' }}>
+            <li>Abra o Telegram</li>
+            <li>Procure por: <strong>@CryptoAnalyzerBot</strong></li>
+            <li>Envie: <strong>/validate CRP-7A8B9C2D-E3F4-5G6H-I7J8-K9L0M1N2O3P4</strong></li>
+            <li>Aguarde confirmação</li>
+          </ol>
+        </div>
+      </div>
+
+      {/* Botões de Ação */}
+      <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+        <button style={{
+          background: 'linear-gradient(135deg, #58DAB3 0%, #4ADE80 100%)',
+          color: '#0F172A',
+          border: 'none',
+          padding: '0.875rem 1.5rem',
+          borderRadius: '8px',
+          fontSize: '0.875rem',
+          fontWeight: '600',
+          cursor: 'pointer'
+        }}>
+          💾 Salvar Configurações
+        </button>
+        
+        <button style={{
+          background: '#1E40AF',
+          color: 'white',
+          border: 'none',
+          padding: '0.875rem 1.5rem',
+          borderRadius: '8px',
+          fontSize: '0.875rem',
+          fontWeight: '600',
+          cursor: 'pointer'
+        }}>
+          🔗 Testar Conexão ByBit
+        </button>
+        
+        <button style={{
+          background: '#6B7280',
+          color: 'white',
+          border: 'none',
+          padding: '0.875rem 1.5rem',
+          borderRadius: '8px',
+          fontSize: '0.875rem',
+          fontWeight: '600',
+          cursor: 'pointer'
+        }}>
+          🔑 Configurar API Keys
+        </button>
       </div>
     </div>
   )
 
   const renderCopyTrading = () => (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-white">Copy Trading</h2>
-      <div className="bg-white/10 backdrop-blur-md rounded-lg p-8 border border-white/20 text-center">
-        <h3 className="text-xl font-bold text-white mb-4">Funcionalidade em Desenvolvimento</h3>
-        <p className="text-gray-300 mb-6">
-          O sistema de Copy Trading está sendo finalizado e estará disponível em breve.
+    <div style={{ padding: '2rem' }}>
+      <h2 style={{ color: '#58DAB3', marginBottom: '1.5rem', fontSize: '1.5rem' }}>👥 Copy Trading</h2>
+      <div style={{
+        background: 'linear-gradient(135deg, #1E293B 0%, #334155 100%)',
+        padding: '3rem',
+        borderRadius: '12px',
+        border: '1px solid #475569',
+        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.3)',
+        textAlign: 'center'
+      }}>
+        <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🚧</div>
+        <h3 style={{ color: '#F8FAFC', margin: '0 0 1rem 0', fontSize: '1.5rem' }}>Em Desenvolvimento</h3>
+        <p style={{ color: '#94A3B8', margin: 0, fontSize: '1rem', lineHeight: '1.5' }}>
+          Sistema de Copy Trading será implementado em breve.<br/>
+          Permitirá copiar automaticamente trades de traders experientes.
         </p>
-        <div className="text-blue-400">🚧 Em Construção 🚧</div>
+      </div>
+    </div>
+  )
+
+  const renderCourses = () => (
+    <div style={{ padding: '2rem' }}>
+      <h2 style={{ color: '#58DAB3', marginBottom: '1.5rem', fontSize: '1.5rem' }}>🎓 Cursos</h2>
+      
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
+        {[
+          {
+            title: "Análise Técnica Fundamentals",
+            description: "Aprenda os conceitos básicos de análise técnica, suportes, resistências e indicadores.",
+            modules: 12,
+            duration: "8 horas",
+            level: "Iniciante",
+            color: "#4ADE80"
+          },
+          {
+            title: "Gestão de Risco Avançada",
+            description: "Domine as técnicas de gestão de risco e proteção de capital no trading.",
+            modules: 8,
+            duration: "6 horas", 
+            level: "Intermediário",
+            color: "#FCD34D"
+          },
+          {
+            title: "Estratégias Avançadas",
+            description: "Estratégias profissionais utilizadas por traders institucionais.",
+            modules: 15,
+            duration: "12 horas",
+            level: "Avançado", 
+            color: "#F87171"
+          }
+        ].map((course, index) => (
+          <div key={index} style={{
+            background: 'linear-gradient(135deg, #1E293B 0%, #334155 100%)',
+            padding: '1.5rem',
+            borderRadius: '12px',
+            border: '1px solid #475569',
+            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.3)'
+          }}>
+            <div style={{ marginBottom: '1rem' }}>
+              <h3 style={{ color: '#F8FAFC', margin: '0 0 0.5rem 0', fontSize: '1.25rem' }}>
+                {course.title}
+              </h3>
+              <div style={{
+                background: course.color,
+                color: course.level === 'Avançado' ? 'white' : '#0F172A',
+                padding: '0.25rem 0.75rem',
+                borderRadius: '20px',
+                fontSize: '0.75rem',
+                fontWeight: '600',
+                display: 'inline-block'
+              }}>
+                {course.level}
+              </div>
+            </div>
+            
+            <p style={{ color: '#94A3B8', margin: '0 0 1rem 0', fontSize: '0.875rem', lineHeight: '1.5' }}>
+              {course.description}
+            </p>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+              <div>
+                <p style={{ color: '#94A3B8', margin: '0 0 0.25rem 0', fontSize: '0.75rem' }}>Módulos</p>
+                <p style={{ color: '#F8FAFC', margin: 0, fontSize: '1rem', fontWeight: '600' }}>{course.modules}</p>
+              </div>
+              <div>
+                <p style={{ color: '#94A3B8', margin: '0 0 0.25rem 0', fontSize: '0.75rem' }}>Duração</p>
+                <p style={{ color: '#F8FAFC', margin: 0, fontSize: '1rem', fontWeight: '600' }}>{course.duration}</p>
+              </div>
+            </div>
+            
+            <button style={{
+              background: '#374151',
+              color: '#94A3B8',
+              border: 'none',
+              padding: '0.75rem 1.5rem',
+              borderRadius: '8px',
+              fontSize: '0.875rem',
+              fontWeight: '600',
+              cursor: 'not-allowed',
+              width: '100%'
+            }}>
+              🚧 Em Desenvolvimento
+            </button>
+          </div>
+        ))}
+      </div>
+      
+      <div style={{
+        background: 'linear-gradient(135deg, #1E293B 0%, #334155 100%)',
+        padding: '2rem',
+        borderRadius: '12px',
+        border: '1px solid #475569',
+        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.3)',
+        textAlign: 'center',
+        marginTop: '2rem'
+      }}>
+        <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📚</div>
+        <h3 style={{ color: '#F8FAFC', margin: '0 0 1rem 0', fontSize: '1.5rem' }}>Plataforma de Ensino</h3>
+        <p style={{ color: '#94A3B8', margin: 0, fontSize: '1rem', lineHeight: '1.5' }}>
+          Nossa plataforma de cursos será lançada em breve com conteúdo exclusivo<br/>
+          desenvolvido por traders profissionais e analistas certificados.
+        </p>
       </div>
     </div>
   )
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
-      <div className="container mx-auto px-4 py-8">
-        <header className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">
-            NexoCrypto
-          </h1>
-          <p className="text-gray-300">
-            Plataforma Avançada de Análise Crypto
-          </p>
-        </header>
+    <div style={{
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #0F172A 0%, #1E293B 100%)',
+      fontFamily: 'Inter, system-ui, sans-serif'
+    }}>
+      {/* Header */}
+      <header style={{
+        background: 'linear-gradient(135deg, #1E293B 0%, #334155 100%)',
+        padding: '1rem 2rem',
+        borderBottom: '1px solid #475569',
+        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.3)'
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <h1 style={{
+              color: '#58DAB3',
+              margin: '0 0 0.25rem 0',
+              fontSize: '2rem',
+              fontWeight: 'bold'
+            }}>
+              NexoCrypto
+            </h1>
+            <p style={{
+              color: '#94A3B8',
+              margin: 0,
+              fontSize: '0.875rem'
+            }}>
+              Sistema Avançado de Trading & Análise
+            </p>
+          </div>
+          
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <div style={{
+                width: '8px',
+                height: '8px',
+                borderRadius: '50%',
+                background: '#4ADE80'
+              }}></div>
+              <span style={{ color: '#4ADE80', fontSize: '0.875rem', fontWeight: '500' }}>
+                Sistema Online
+              </span>
+            </div>
+            
+            <button
+              onClick={handleLogout}
+              style={{
+                background: '#EF4444',
+                color: 'white',
+                border: 'none',
+                padding: '0.5rem 1rem',
+                borderRadius: '6px',
+                fontSize: '0.875rem',
+                fontWeight: '500',
+                cursor: 'pointer'
+              }}
+            >
+              🚪 Sair
+            </button>
+          </div>
+        </div>
+      </header>
 
-        {/* Navigation Tabs */}
-        <div className="flex flex-wrap justify-center mb-8 space-x-2">
+      {/* Navigation */}
+      <nav style={{
+        background: '#1E293B',
+        padding: '1rem 2rem',
+        borderBottom: '1px solid #334155'
+      }}>
+        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
           {[
             { id: 'dashboard', label: '📊 Dashboard', icon: '📊' },
             { id: 'signals', label: '📈 Sinais', icon: '📈' },
             { id: 'gems', label: '💎 Gems', icon: '💎' },
             { id: 'news', label: '📰 Notícias', icon: '📰' },
-            { id: 'courses', label: '🎓 Cursos', icon: '🎓' },
-            { id: 'auto-trading', label: '🤖 Auto Trading', icon: '🤖' },
-            { id: 'copy-trading', label: '👥 Copy Trading', icon: '👥' }
-          ].map((tab) => (
+            { id: 'autotrading', label: '🤖 Auto Trading', icon: '🤖' },
+            { id: 'copytrading', label: '👥 Copy Trading', icon: '👥' },
+            { id: 'courses', label: '🎓 Cursos', icon: '🎓' }
+          ].map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                activeTab === tab.id
-                  ? 'bg-purple-600 text-white'
-                  : 'bg-white/10 text-gray-300 hover:bg-white/20'
-              }`}
+              style={{
+                background: activeTab === tab.id 
+                  ? 'linear-gradient(135deg, #58DAB3 0%, #4ADE80 100%)' 
+                  : 'transparent',
+                color: activeTab === tab.id ? '#0F172A' : '#94A3B8',
+                border: activeTab === tab.id ? 'none' : '1px solid #334155',
+                padding: '0.75rem 1rem',
+                borderRadius: '8px',
+                fontSize: '0.875rem',
+                fontWeight: '500',
+                cursor: 'pointer',
+                transition: 'all 0.2s'
+              }}
+              onMouseOver={(e) => {
+                if (activeTab !== tab.id) {
+                  e.target.style.background = '#334155'
+                  e.target.style.color = '#F8FAFC'
+                }
+              }}
+              onMouseOut={(e) => {
+                if (activeTab !== tab.id) {
+                  e.target.style.background = 'transparent'
+                  e.target.style.color = '#94A3B8'
+                }
+              }}
             >
               {tab.label}
             </button>
           ))}
         </div>
+      </nav>
 
-        {/* Content */}
-        <div className="min-h-[600px]">
-          {activeTab === 'dashboard' && renderDashboard()}
-          {activeTab === 'signals' && renderSignals()}
-          {activeTab === 'gems' && renderGems()}
-          {activeTab === 'news' && renderNews()}
-          {activeTab === 'courses' && renderCourses()}
-          {activeTab === 'auto-trading' && renderAutoTrading()}
-          {activeTab === 'copy-trading' && renderCopyTrading()}
-        </div>
-      </div>
+      {/* Main Content */}
+      <main>
+        {activeTab === 'dashboard' && renderDashboard()}
+        {activeTab === 'signals' && renderSignals()}
+        {activeTab === 'gems' && renderGems()}
+        {activeTab === 'news' && renderNews()}
+        {activeTab === 'autotrading' && renderAutoTrading()}
+        {activeTab === 'copytrading' && renderCopyTrading()}
+        {activeTab === 'courses' && renderCourses()}
+      </main>
     </div>
   )
 }

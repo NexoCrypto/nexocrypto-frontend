@@ -128,7 +128,7 @@ function App() {
       stopLoss: '67,200',
       confidence: 85,
       date: '08/08/2025',
-      time: '14:30',
+      time: '17:30',
       status: 'Ativo'
     },
     {
@@ -141,7 +141,7 @@ function App() {
       stopLoss: '2,700',
       confidence: 78,
       date: '08/08/2025',
-      time: '13:15',
+      time: '17:15',
       status: 'Ativo'
     },
     {
@@ -154,7 +154,7 @@ function App() {
       stopLoss: '180',
       confidence: 92,
       date: '08/08/2025',
-      time: '12:45',
+      time: '16:45',
       status: 'Lucro'
     }
   ]
@@ -214,7 +214,7 @@ function App() {
       summary: 'BTC quebra resistência importante e analistas preveem continuação da alta',
       source: 'CoinDesk',
       date: '08/08/2025',
-      time: '15:30',
+      time: '17:30',
       category: 'Market',
       impact: 'High'
     },
@@ -224,7 +224,7 @@ function App() {
       summary: 'Rede Ethereum implementa melhorias de escalabilidade e eficiência energética',
       source: 'CoinTelegraph',
       date: '08/08/2025',
-      time: '14:15',
+      time: '17:15',
       category: 'Technology',
       impact: 'High'
     },
@@ -234,7 +234,7 @@ function App() {
       summary: 'Banco Central anuncia novas diretrizes para exchanges e stablecoins',
       source: 'InfoMoney',
       date: '08/08/2025',
-      time: '13:00',
+      time: '16:00',
       category: 'Regulation',
       impact: 'Medium'
     }
@@ -1694,9 +1694,9 @@ function App() {
             
             <div style={{ display: 'grid', gap: '1rem' }}>
               {[
-                { pair: 'BTCUSDT', type: 'LONG', result: '+2.3%', source: 'Binance Killers', color: '#10B981', time: '14:32', entry: '67,450', exit: '69,001' },
-                { pair: 'ETHUSDT', type: 'SHORT', result: '-1.1%', source: 'ByBit Pro', color: '#EF4444', time: '13:15', entry: '3,245', exit: '3,209' },
-                { pair: 'SOLUSDT', type: 'LONG', result: 'Em andamento', source: 'Binance Killers', color: '#F59E0B', time: '15:47', entry: '142.30', exit: '-' }
+                { pair: 'BTCUSDT', type: 'LONG', result: '+2.3%', source: 'Binance Killers', color: '#10B981', time: '17:32', entry: '67,450', exit: '69,001' },
+                { pair: 'ETHUSDT', type: 'SHORT', result: '-1.1%', source: 'ByBit Pro', color: '#EF4444', time: '17:15', entry: '3,245', exit: '3,209' },
+                { pair: 'SOLUSDT', type: 'LONG', result: 'Em andamento', source: 'Binance Killers', color: '#F59E0B', time: '16:47', entry: '142.30', exit: '-' }
               ].map((trade, index) => (
                 <div key={index} style={{
                   background: 'rgba(148, 163, 184, 0.05)',

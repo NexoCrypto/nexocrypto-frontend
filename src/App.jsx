@@ -198,6 +198,8 @@ function App() {
 
   // Efeito para gerar UUID inicial e verificar validação periodicamente
   useEffect(() => {
+    if (!isAuthenticated) return // Só executa se estiver autenticado
+    
     generateNewUUID()
     
     // Verificação inicial imediata
@@ -211,7 +213,7 @@ function App() {
     }, 2000) // A cada 2 segundos
     
     return () => clearInterval(interval)
-  }, [currentUUID])
+  }, [currentUUID, isAuthenticated])
 
   // Dados atualizados com preços reais de 07/08/2025
   const mockSignals = [

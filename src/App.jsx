@@ -75,6 +75,13 @@ function App() {
     }
   }
 
+  // Função para desconectar Telegram
+  const disconnectTelegram = () => {
+    setTelegramUsername('')
+    generateNewUUID()
+    alert('Telegram desconectado com sucesso! Um novo UUID foi gerado.')
+  }
+
   // Função para verificar validação do Telegram
   const checkTelegramValidation = async () => {
     if (!currentUUID) return
@@ -1318,16 +1325,36 @@ ${signal.analysis}
             <span style={{ color: '#F8FAFC', fontSize: '0.875rem', fontWeight: '500' }}>
               UUID de Validação
             </span>
-            <span style={{
-              background: '#4ADE80',
-              color: '#065F46',
-              padding: '0.25rem 0.75rem',
-              borderRadius: '20px',
-              fontSize: '0.75rem',
-              fontWeight: '600'
-            }}>
-              ✅ VALIDADO
-            </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <span style={{
+                background: '#4ADE80',
+                color: '#065F46',
+                padding: '0.25rem 0.75rem',
+                borderRadius: '20px',
+                fontSize: '0.75rem',
+                fontWeight: '600'
+              }}>
+                ✅ VALIDADO
+              </span>
+              <button 
+                onClick={disconnectTelegram}
+                style={{
+                  background: '#EF4444',
+                  color: 'white',
+                  border: 'none',
+                  padding: '0.25rem 0.5rem',
+                  borderRadius: '4px',
+                  fontSize: '0.7rem',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s'
+                }}
+                onMouseOver={(e) => e.target.style.background = '#DC2626'}
+                onMouseOut={(e) => e.target.style.background = '#EF4444'}
+              >
+                🔌 Desconectar
+              </button>
+            </div>
           </div>
           
           <div style={{

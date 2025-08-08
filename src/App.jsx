@@ -11,6 +11,22 @@ function App() {
   const [telegramUsername, setTelegramUsername] = useState('')
   const [isValidated, setIsValidated] = useState(false)
   const [activeTab, setActiveTab] = useState('dashboard')
+  
+  // Estados para autenticação avançada
+  const [showRegister, setShowRegister] = useState(false)
+  const [showForgotPassword, setShowForgotPassword] = useState(false)
+  const [registerForm, setRegisterForm] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    password: '',
+    confirmPassword: ''
+  })
+  const [verificationStep, setVerificationStep] = useState('')
+  const [verificationCodes, setVerificationCodes] = useState({
+    email: '',
+    sms: ''
+  })
 
   // Verificar se já está logado
   useEffect(() => {
@@ -62,6 +78,38 @@ function App() {
     }
   }
 
+  // Funções de autenticação avançada
+  const handleRegister = (e) => {
+    e.preventDefault()
+    if (registerForm.password !== registerForm.confirmPassword) {
+      alert('Senhas não coincidem!')
+      return
+    }
+    setVerificationStep('email')
+    alert('Código de verificação enviado para seu e-mail!')
+  }
+
+  const handleForgotPassword = (e) => {
+    e.preventDefault()
+    alert('Link de recuperação enviado para seu e-mail!')
+    setShowForgotPassword(false)
+  }
+
+  const handleGoogleLogin = () => {
+    alert('Redirecionando para login com Google...')
+  }
+
+  const handleVerification = (type) => {
+    if (type === 'email') {
+      setVerificationStep('sms')
+      alert('Código SMS enviado!')
+    } else {
+      alert('Conta criada com sucesso!')
+      setShowRegister(false)
+      setVerificationStep('')
+    }
+  }
+
   // Credenciais de admin
   const adminCredentials = [
     { username: 'admin@nexocrypto.app', password: 'NexoCrypto2025!@#' },
@@ -87,6 +135,390 @@ function App() {
 
   // Página de Login
   if (!isAuthenticated) {
+    // Tela de Cadastro
+    if (showRegister) {
+      if (verificationStep === 'email') {
+        return (
+          <div style={{
+            minHeight: '100vh',
+            background: 'linear-gradient(135deg, #0F172A 0%, #1E293B 100%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontFamily: 'Inter, system-ui, sans-serif'
+          }}>
+            <div style={{
+              background: 'rgba(30, 41, 59, 0.8)',
+              padding: '2rem',
+              borderRadius: '1rem',
+              border: '1px solid rgba(148, 163, 184, 0.1)',
+              backdropFilter: 'blur(10px)',
+              width: '100%',
+              maxWidth: '400px'
+            }}>
+              <h2 style={{ color: '#10B981', textAlign: 'center', marginBottom: '1rem' }}>
+                Verificação E-mail
+              </h2>
+              <p style={{ color: '#94A3B8', textAlign: 'center', marginBottom: '2rem' }}>
+                Digite o código enviado para seu e-mail
+              </p>
+              <input
+                type="text"
+                value={verificationCodes.email}
+                onChange={(e) => setVerificationCodes({...verificationCodes, email: e.target.value})}
+                placeholder="Código de 6 dígitos"
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  borderRadius: '0.5rem',
+                  border: '2px solid #10B981',
+                  background: 'rgba(15, 23, 42, 0.8)',
+                  color: '#F1F5F9',
+                  fontSize: '1rem',
+                  marginBottom: '1rem'
+                }}
+              />
+              <button
+                onClick={() => handleVerification('email')}
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  borderRadius: '0.5rem',
+                  border: 'none',
+                  background: '#10B981',
+                  color: 'white',
+                  fontSize: '1rem',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                  marginBottom: '1rem'
+                }}
+              >
+                Verificar E-mail
+              </button>
+              <button
+                onClick={() => setShowRegister(false)}
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  borderRadius: '0.5rem',
+                  border: '2px solid #EF4444',
+                  background: 'transparent',
+                  color: '#EF4444',
+                  fontSize: '1rem',
+                  cursor: 'pointer'
+                }}
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        )
+      }
+
+      if (verificationStep === 'sms') {
+        return (
+          <div style={{
+            minHeight: '100vh',
+            background: 'linear-gradient(135deg, #0F172A 0%, #1E293B 100%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontFamily: 'Inter, system-ui, sans-serif'
+          }}>
+            <div style={{
+              background: 'rgba(30, 41, 59, 0.8)',
+              padding: '2rem',
+              borderRadius: '1rem',
+              border: '1px solid rgba(148, 163, 184, 0.1)',
+              backdropFilter: 'blur(10px)',
+              width: '100%',
+              maxWidth: '400px'
+            }}>
+              <h2 style={{ color: '#F59E0B', textAlign: 'center', marginBottom: '1rem' }}>
+                Verificação SMS
+              </h2>
+              <p style={{ color: '#94A3B8', textAlign: 'center', marginBottom: '2rem' }}>
+                Digite o código SMS enviado para seu telefone
+              </p>
+              <input
+                type="text"
+                value={verificationCodes.sms}
+                onChange={(e) => setVerificationCodes({...verificationCodes, sms: e.target.value})}
+                placeholder="Código de 6 dígitos"
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  borderRadius: '0.5rem',
+                  border: '2px solid #F59E0B',
+                  background: 'rgba(15, 23, 42, 0.8)',
+                  color: '#F1F5F9',
+                  fontSize: '1rem',
+                  marginBottom: '1rem'
+                }}
+              />
+              <button
+                onClick={() => handleVerification('sms')}
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  borderRadius: '0.5rem',
+                  border: 'none',
+                  background: '#F59E0B',
+                  color: 'white',
+                  fontSize: '1rem',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                  marginBottom: '1rem'
+                }}
+              >
+                Finalizar Cadastro
+              </button>
+              <button
+                onClick={() => setShowRegister(false)}
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  borderRadius: '0.5rem',
+                  border: '2px solid #EF4444',
+                  background: 'transparent',
+                  color: '#EF4444',
+                  fontSize: '1rem',
+                  cursor: 'pointer'
+                }}
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        )
+      }
+
+      return (
+        <div style={{
+          minHeight: '100vh',
+          background: 'linear-gradient(135deg, #0F172A 0%, #1E293B 100%)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontFamily: 'Inter, system-ui, sans-serif'
+        }}>
+          <div style={{
+            background: 'rgba(30, 41, 59, 0.8)',
+            padding: '2rem',
+            borderRadius: '1rem',
+            border: '1px solid rgba(148, 163, 184, 0.1)',
+            backdropFilter: 'blur(10px)',
+            width: '100%',
+            maxWidth: '400px'
+          }}>
+            <h2 style={{ color: '#3B82F6', textAlign: 'center', marginBottom: '1rem' }}>
+              Cadastro
+            </h2>
+            <form onSubmit={handleRegister}>
+              <input
+                type="text"
+                placeholder="Nome completo"
+                value={registerForm.name}
+                onChange={(e) => setRegisterForm({...registerForm, name: e.target.value})}
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  borderRadius: '0.5rem',
+                  border: '2px solid #3B82F6',
+                  background: 'rgba(15, 23, 42, 0.8)',
+                  color: '#F1F5F9',
+                  fontSize: '1rem',
+                  marginBottom: '1rem'
+                }}
+                required
+              />
+              <input
+                type="email"
+                placeholder="E-mail"
+                value={registerForm.email}
+                onChange={(e) => setRegisterForm({...registerForm, email: e.target.value})}
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  borderRadius: '0.5rem',
+                  border: '2px solid #3B82F6',
+                  background: 'rgba(15, 23, 42, 0.8)',
+                  color: '#F1F5F9',
+                  fontSize: '1rem',
+                  marginBottom: '1rem'
+                }}
+                required
+              />
+              <input
+                type="tel"
+                placeholder="Telefone"
+                value={registerForm.phone}
+                onChange={(e) => setRegisterForm({...registerForm, phone: e.target.value})}
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  borderRadius: '0.5rem',
+                  border: '2px solid #3B82F6',
+                  background: 'rgba(15, 23, 42, 0.8)',
+                  color: '#F1F5F9',
+                  fontSize: '1rem',
+                  marginBottom: '1rem'
+                }}
+                required
+              />
+              <input
+                type="password"
+                placeholder="Senha"
+                value={registerForm.password}
+                onChange={(e) => setRegisterForm({...registerForm, password: e.target.value})}
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  borderRadius: '0.5rem',
+                  border: '2px solid #3B82F6',
+                  background: 'rgba(15, 23, 42, 0.8)',
+                  color: '#F1F5F9',
+                  fontSize: '1rem',
+                  marginBottom: '1rem'
+                }}
+                required
+              />
+              <input
+                type="password"
+                placeholder="Confirmar senha"
+                value={registerForm.confirmPassword}
+                onChange={(e) => setRegisterForm({...registerForm, confirmPassword: e.target.value})}
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  borderRadius: '0.5rem',
+                  border: '2px solid #3B82F6',
+                  background: 'rgba(15, 23, 42, 0.8)',
+                  color: '#F1F5F9',
+                  fontSize: '1rem',
+                  marginBottom: '1rem'
+                }}
+                required
+              />
+              <button
+                type="submit"
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  borderRadius: '0.5rem',
+                  border: 'none',
+                  background: '#3B82F6',
+                  color: 'white',
+                  fontSize: '1rem',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                  marginBottom: '1rem'
+                }}
+              >
+                Cadastrar
+              </button>
+            </form>
+            <button
+              onClick={() => setShowRegister(false)}
+              style={{
+                width: '100%',
+                padding: '0.75rem',
+                borderRadius: '0.5rem',
+                border: '2px solid #EF4444',
+                background: 'transparent',
+                color: '#EF4444',
+                fontSize: '1rem',
+                cursor: 'pointer'
+              }}
+            >
+              Voltar ao Login
+            </button>
+          </div>
+        </div>
+      )
+    }
+
+    // Tela de Esqueci minha senha
+    if (showForgotPassword) {
+      return (
+        <div style={{
+          minHeight: '100vh',
+          background: 'linear-gradient(135deg, #0F172A 0%, #1E293B 100%)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontFamily: 'Inter, system-ui, sans-serif'
+        }}>
+          <div style={{
+            background: 'rgba(30, 41, 59, 0.8)',
+            padding: '2rem',
+            borderRadius: '1rem',
+            border: '1px solid rgba(148, 163, 184, 0.1)',
+            backdropFilter: 'blur(10px)',
+            width: '100%',
+            maxWidth: '400px'
+          }}>
+            <h2 style={{ color: '#F59E0B', textAlign: 'center', marginBottom: '1rem' }}>
+              Recuperar Senha
+            </h2>
+            <p style={{ color: '#94A3B8', textAlign: 'center', marginBottom: '2rem' }}>
+              Digite seu e-mail para receber o link de recuperação
+            </p>
+            <form onSubmit={handleForgotPassword}>
+              <input
+                type="email"
+                placeholder="Seu e-mail"
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  borderRadius: '0.5rem',
+                  border: '2px solid #F59E0B',
+                  background: 'rgba(15, 23, 42, 0.8)',
+                  color: '#F1F5F9',
+                  fontSize: '1rem',
+                  marginBottom: '1rem'
+                }}
+                required
+              />
+              <button
+                type="submit"
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  borderRadius: '0.5rem',
+                  border: 'none',
+                  background: '#F59E0B',
+                  color: 'white',
+                  fontSize: '1rem',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                  marginBottom: '1rem'
+                }}
+              >
+                Enviar Link
+              </button>
+            </form>
+            <button
+              onClick={() => setShowForgotPassword(false)}
+              style={{
+                width: '100%',
+                padding: '0.75rem',
+                borderRadius: '0.5rem',
+                border: '2px solid #EF4444',
+                background: 'transparent',
+                color: '#EF4444',
+                fontSize: '1rem',
+                cursor: 'pointer'
+              }}
+            >
+              Voltar ao Login
+            </button>
+          </div>
+        </div>
+      )
+    }
+
+    // Tela de Login Principal
     return (
       <div style={{
         minHeight: '100vh',
@@ -179,6 +611,62 @@ function App() {
               Entrar
             </button>
           </form>
+
+          {/* Botões de autenticação avançada */}
+          <div style={{ marginTop: '1rem' }}>
+            <button
+              onClick={handleGoogleLogin}
+              style={{
+                width: '100%',
+                padding: '0.75rem',
+                borderRadius: '0.5rem',
+                border: '2px solid #DB4437',
+                background: 'transparent',
+                color: '#DB4437',
+                fontSize: '1rem',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                marginBottom: '0.5rem'
+              }}
+            >
+              🔍 Entrar com Google
+            </button>
+            
+            <button
+              onClick={() => setShowRegister(true)}
+              style={{
+                width: '100%',
+                padding: '0.75rem',
+                borderRadius: '0.5rem',
+                border: '2px solid #3B82F6',
+                background: 'transparent',
+                color: '#3B82F6',
+                fontSize: '1rem',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                marginBottom: '0.5rem'
+              }}
+            >
+              📝 Cadastrar
+            </button>
+            
+            <button
+              onClick={() => setShowForgotPassword(true)}
+              style={{
+                width: '100%',
+                padding: '0.75rem',
+                borderRadius: '0.5rem',
+                border: '2px solid #F59E0B',
+                background: 'transparent',
+                color: '#F59E0B',
+                fontSize: '1rem',
+                fontWeight: 'bold',
+                cursor: 'pointer'
+              }}
+            >
+              🔑 Esqueci minha senha
+            </button>
+          </div>
         </div>
       </div>
     )

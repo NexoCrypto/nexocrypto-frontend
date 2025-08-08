@@ -854,7 +854,9 @@ function App() {
           { id: 'signals', label: 'Sinais', icon: '📈' },
           { id: 'gems', label: 'Gems', icon: '💎' },
           { id: 'news', label: 'Notícias', icon: '📰' },
-          { id: 'autotrading', label: 'Auto Trading', icon: '🤖' }
+          { id: 'autotrading', label: 'Auto Trading', icon: '🤖' },
+          { id: 'copytrading', label: 'Copy Trading', icon: '👥' },
+          { id: 'courses', label: 'Cursos', icon: '🎓' }
         ].map(tab => (
           <button
             key={tab.id}
@@ -1175,6 +1177,7 @@ function App() {
         </div>
       )}
 
+      {/* Aba Auto Trading */}
       {activeTab === 'autotrading' && (
         <div style={{
           background: 'rgba(30, 41, 59, 0.8)',
@@ -1184,109 +1187,567 @@ function App() {
           backdropFilter: 'blur(10px)',
           marginBottom: '2rem'
         }}>
-          <h2 style={{ color: '#8B5CF6', marginBottom: '1.5rem' }}>
-            🤖 Auto Trading
-          </h2>
-        
-        {/* UUID Section */}
-        <div style={{ marginBottom: '2rem' }}>
-          <h3 style={{ color: '#F59E0B', marginBottom: '1rem' }}>
-            Validação Telegram
-          </h3>
-          
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+            <h2 style={{ color: '#F1F5F9', margin: 0, fontSize: '1.5rem', fontWeight: '600' }}>
+              🤖 Auto Trading
+            </h2>
+            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+              <div style={{
+                background: isValidated ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                border: `1px solid ${isValidated ? 'rgba(16, 185, 129, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`,
+                padding: '0.5rem 1rem',
+                borderRadius: '0.5rem',
+                color: isValidated ? '#10B981' : '#EF4444',
+                fontSize: '0.875rem',
+                fontWeight: '500'
+              }}>
+                {isValidated ? 'Sistema Ativo' : 'Sistema Inativo'}
+              </div>
+            </div>
+          </div>
+
+          {/* Painel de Controle Principal */}
           <div style={{
             background: 'rgba(15, 23, 42, 0.8)',
-            padding: '1rem',
-            borderRadius: '0.5rem',
-            border: '2px solid #10B981',
-            marginBottom: '1rem'
+            padding: '1.5rem',
+            borderRadius: '0.75rem',
+            border: '1px solid rgba(148, 163, 184, 0.1)',
+            marginBottom: '1.5rem'
           }}>
-            <p style={{ color: '#94A3B8', margin: '0 0 0.5rem 0' }}>
-              UUID Atual:
-            </p>
-            <p style={{ 
-              color: '#F1F5F9', 
-              fontFamily: 'monospace',
-              fontSize: '0.9rem',
-              margin: 0,
-              wordBreak: 'break-all'
-            }}>
-              {currentUUID || 'Gerando...'}
-            </p>
-          </div>
-
-          <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
-            <button
-              onClick={generateNewUUID}
-              style={{
-                padding: '0.75rem 1.5rem',
-                borderRadius: '0.5rem',
-                border: 'none',
-                background: '#10B981',
-                color: 'white',
-                fontSize: '1rem',
-                cursor: 'pointer'
-              }}
-            >
-              Gerar Novo UUID
-            </button>
+            <h3 style={{ color: '#F1F5F9', margin: '0 0 1.5rem 0', fontSize: '1.25rem', fontWeight: '600' }}>
+              🎛️ Painel de Controle
+            </h3>
             
-            <button
-              onClick={checkTelegramValidation}
-              style={{
-                padding: '0.75rem 1.5rem',
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem' }}>
+              {/* Status do Bot */}
+              <div style={{
+                background: 'rgba(148, 163, 184, 0.05)',
+                padding: '1rem',
                 borderRadius: '0.5rem',
-                border: 'none',
-                background: '#3B82F6',
-                color: 'white',
-                fontSize: '1rem',
-                cursor: 'pointer'
-              }}
-            >
-              Verificar Validação
+                border: '1px solid rgba(148, 163, 184, 0.1)'
+              }}>
+                <label style={{ color: '#94A3B8', fontSize: '0.875rem', display: 'block', marginBottom: '0.75rem' }}>
+                  Status do Bot
+                </label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <div style={{
+                    width: '12px',
+                    height: '12px',
+                    borderRadius: '50%',
+                    background: isValidated ? '#10B981' : '#EF4444',
+                    boxShadow: `0 0 8px ${isValidated ? '#10B981' : '#EF4444'}50`
+                  }}></div>
+                  <span style={{ 
+                    color: isValidated ? '#10B981' : '#EF4444', 
+                    fontSize: '0.875rem', 
+                    fontWeight: '600',
+                    textTransform: 'uppercase'
+                  }}>
+                    {isValidated ? 'ATIVO' : 'INATIVO'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Valor Máximo por Operação */}
+              <div style={{
+                background: 'rgba(148, 163, 184, 0.05)',
+                padding: '1rem',
+                borderRadius: '0.5rem',
+                border: '1px solid rgba(148, 163, 184, 0.1)'
+              }}>
+                <label style={{ color: '#94A3B8', fontSize: '0.875rem', display: 'block', marginBottom: '0.75rem' }}>
+                  Valor Máximo por Operação
+                </label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <input
+                    type="number"
+                    defaultValue="100"
+                    style={{
+                      background: 'rgba(15, 23, 42, 0.8)',
+                      border: '1px solid rgba(148, 163, 184, 0.2)',
+                      borderRadius: '0.375rem',
+                      color: '#F1F5F9',
+                      padding: '0.5rem',
+                      fontSize: '0.875rem',
+                      width: '80px'
+                    }}
+                  />
+                  <span style={{ color: '#94A3B8', fontSize: '0.875rem' }}>USDT</span>
+                </div>
+              </div>
+
+              {/* Percentual do Saldo */}
+              <div style={{
+                background: 'rgba(148, 163, 184, 0.05)',
+                padding: '1rem',
+                borderRadius: '0.5rem',
+                border: '1px solid rgba(148, 163, 184, 0.1)'
+              }}>
+                <label style={{ color: '#94A3B8', fontSize: '0.875rem', display: 'block', marginBottom: '0.75rem' }}>
+                  % do Saldo por Trade
+                </label>
+                <input
+                  type="range"
+                  min="1"
+                  max="10"
+                  defaultValue="2"
+                  style={{ 
+                    width: '100%', 
+                    marginBottom: '0.5rem',
+                    accentColor: '#10B981'
+                  }}
+                />
+                <span style={{ color: '#10B981', fontSize: '0.875rem', fontWeight: '500' }}>2%</span>
+              </div>
+
+              {/* Análise Automática */}
+              <div style={{
+                background: 'rgba(148, 163, 184, 0.05)',
+                padding: '1rem',
+                borderRadius: '0.5rem',
+                border: '1px solid rgba(148, 163, 184, 0.1)'
+              }}>
+                <label style={{ color: '#94A3B8', fontSize: '0.875rem', display: 'block', marginBottom: '0.75rem' }}>
+                  Análise Automática
+                </label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <input type="checkbox" defaultChecked style={{ accentColor: '#10B981' }} />
+                  <span style={{ color: '#F1F5F9', fontSize: '0.875rem' }}>Validar sinais antes de executar</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Configurações Avançadas */}
+          <div style={{
+            background: 'rgba(15, 23, 42, 0.8)',
+            padding: '1.5rem',
+            borderRadius: '0.75rem',
+            border: '1px solid rgba(148, 163, 184, 0.1)',
+            marginBottom: '1.5rem'
+          }}>
+            <h3 style={{ color: '#F1F5F9', margin: '0 0 1.5rem 0', fontSize: '1.25rem', fontWeight: '600' }}>
+              ⚙️ Configurações Avançadas
+            </h3>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
+              {/* Corretora */}
+              <div>
+                <label style={{ color: '#94A3B8', fontSize: '0.875rem', display: 'block', marginBottom: '0.75rem' }}>
+                  Corretora Preferencial
+                </label>
+                <select style={{
+                  background: 'rgba(15, 23, 42, 0.8)',
+                  border: '1px solid rgba(148, 163, 184, 0.2)',
+                  borderRadius: '0.375rem',
+                  color: '#F1F5F9',
+                  padding: '0.75rem',
+                  fontSize: '0.875rem',
+                  width: '100%'
+                }}>
+                  <option value="bybit">ByBit</option>
+                  <option value="binance">Binance</option>
+                  <option value="mexc">MEXC</option>
+                </select>
+              </div>
+
+              {/* Pares Permitidos */}
+              <div>
+                <label style={{ color: '#94A3B8', fontSize: '0.875rem', display: 'block', marginBottom: '0.75rem' }}>
+                  Pares Permitidos
+                </label>
+                <select style={{
+                  background: 'rgba(15, 23, 42, 0.8)',
+                  border: '1px solid rgba(148, 163, 184, 0.2)',
+                  borderRadius: '0.375rem',
+                  color: '#F1F5F9',
+                  padding: '0.75rem',
+                  fontSize: '0.875rem',
+                  width: '100%'
+                }}>
+                  <option value="all">Todos os pares /USDT</option>
+                  <option value="btc">Apenas BTC/USDT</option>
+                  <option value="eth">Apenas ETH/USDT</option>
+                  <option value="major">Apenas moedas principais</option>
+                  <option value="custom">Personalizado</option>
+                </select>
+              </div>
+
+              {/* Stop Loss */}
+              <div>
+                <label style={{ color: '#94A3B8', fontSize: '0.875rem', display: 'block', marginBottom: '0.75rem' }}>
+                  Stop Loss Automático
+                </label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <input
+                    type="number"
+                    defaultValue="5"
+                    style={{
+                      background: 'rgba(15, 23, 42, 0.8)',
+                      border: '1px solid rgba(148, 163, 184, 0.2)',
+                      borderRadius: '0.375rem',
+                      color: '#F1F5F9',
+                      padding: '0.5rem',
+                      fontSize: '0.875rem',
+                      width: '60px'
+                    }}
+                  />
+                  <span style={{ color: '#94A3B8', fontSize: '0.875rem' }}>%</span>
+                </div>
+              </div>
+
+              {/* Take Profit */}
+              <div>
+                <label style={{ color: '#94A3B8', fontSize: '0.875rem', display: 'block', marginBottom: '0.75rem' }}>
+                  Take Profit Automático
+                </label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <input
+                    type="number"
+                    defaultValue="15"
+                    style={{
+                      background: 'rgba(15, 23, 42, 0.8)',
+                      border: '1px solid rgba(148, 163, 184, 0.2)',
+                      borderRadius: '0.375rem',
+                      color: '#F1F5F9',
+                      padding: '0.5rem',
+                      fontSize: '0.875rem',
+                      width: '60px'
+                    }}
+                  />
+                  <span style={{ color: '#94A3B8', fontSize: '0.875rem' }}>%</span>
+                </div>
+              </div>
+
+              {/* Alavancagem */}
+              <div>
+                <label style={{ color: '#94A3B8', fontSize: '0.875rem', display: 'block', marginBottom: '0.75rem' }}>
+                  Alavancagem Máxima
+                </label>
+                <select style={{
+                  background: 'rgba(15, 23, 42, 0.8)',
+                  border: '1px solid rgba(148, 163, 184, 0.2)',
+                  borderRadius: '0.375rem',
+                  color: '#F1F5F9',
+                  padding: '0.75rem',
+                  fontSize: '0.875rem',
+                  width: '100%'
+                }}>
+                  <option value="1">1x (Spot)</option>
+                  <option value="5">5x</option>
+                  <option value="10">10x</option>
+                  <option value="20">20x</option>
+                  <option value="50">50x</option>
+                </select>
+              </div>
+
+              {/* Horário de Funcionamento */}
+              <div>
+                <label style={{ color: '#94A3B8', fontSize: '0.875rem', display: 'block', marginBottom: '0.75rem' }}>
+                  Horário de Funcionamento
+                </label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <input type="checkbox" defaultChecked style={{ accentColor: '#10B981' }} />
+                  <span style={{ color: '#F1F5F9', fontSize: '0.875rem' }}>24/7</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Validação Telegram */}
+          <div style={{
+            background: 'rgba(15, 23, 42, 0.8)',
+            padding: '1.5rem',
+            borderRadius: '0.75rem',
+            border: '1px solid rgba(148, 163, 184, 0.1)',
+            marginBottom: '1.5rem'
+          }}>
+            <h3 style={{ color: '#F1F5F9', margin: '0 0 1.5rem 0', fontSize: '1.25rem', fontWeight: '600' }}>
+              📱 Validação Telegram
+            </h3>
+            
+            <div style={{
+              background: 'rgba(148, 163, 184, 0.05)',
+              padding: '1rem',
+              borderRadius: '0.5rem',
+              border: '1px solid rgba(148, 163, 184, 0.1)',
+              marginBottom: '1rem'
+            }}>
+              <p style={{ color: '#94A3B8', margin: '0 0 0.5rem 0', fontSize: '0.875rem' }}>
+                UUID Atual:
+              </p>
+              <p style={{ 
+                color: '#F1F5F9', 
+                fontFamily: 'monospace',
+                fontSize: '0.9rem',
+                margin: 0,
+                wordBreak: 'break-all'
+              }}>
+                {currentUUID || 'Gerando...'}
+              </p>
+            </div>
+
+            <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+              <button
+                onClick={generateNewUUID}
+                style={{
+                  padding: '0.75rem 1.5rem',
+                  borderRadius: '0.5rem',
+                  border: 'none',
+                  background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+                  color: 'white',
+                  fontSize: '0.875rem',
+                  fontWeight: '500',
+                  cursor: 'pointer'
+                }}
+              >
+                Gerar Novo UUID
+              </button>
+              
+              <button
+                onClick={checkTelegramValidation}
+                style={{
+                  padding: '0.75rem 1.5rem',
+                  borderRadius: '0.5rem',
+                  border: 'none',
+                  background: 'linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%)',
+                  color: 'white',
+                  fontSize: '0.875rem',
+                  fontWeight: '500',
+                  cursor: 'pointer'
+                }}
+              >
+                Verificar Validação
+              </button>
+            </div>
+
+            {/* Status da Validação */}
+            <div style={{
+              background: isValidated ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+              border: `1px solid ${isValidated ? 'rgba(16, 185, 129, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`,
+              padding: '1rem',
+              borderRadius: '0.5rem',
+              textAlign: 'center',
+              marginBottom: '1.5rem'
+            }}>
+              <p style={{ 
+                color: isValidated ? '#10B981' : '#EF4444',
+                margin: 0,
+                fontWeight: '600',
+                fontSize: '1rem'
+              }}>
+                {isValidated ? '✅ VALIDADO' : '❌ NÃO VALIDADO'}
+              </p>
+              {isValidated && telegramUsername && (
+                <p style={{ color: '#94A3B8', margin: '0.5rem 0 0 0', fontSize: '0.875rem' }}>
+                  Usuário: {telegramUsername}
+                </p>
+              )}
+            </div>
+
+            {/* Instruções */}
+            <div style={{
+              background: 'rgba(59, 130, 246, 0.1)',
+              border: '1px solid rgba(59, 130, 246, 0.3)',
+              padding: '1rem',
+              borderRadius: '0.5rem'
+            }}>
+              <h4 style={{ color: '#3B82F6', margin: '0 0 0.75rem 0', fontSize: '1rem', fontWeight: '600' }}>
+                📋 Como validar:
+              </h4>
+              <ol style={{ color: '#94A3B8', margin: 0, paddingLeft: '1.5rem', fontSize: '0.875rem', lineHeight: '1.6' }}>
+                <li>Copie o UUID acima</li>
+                <li>Acesse o bot: @nexocrypto_trading_bot</li>
+                <li>Digite: /validate [UUID]</li>
+                <li>Clique em "Verificar Validação"</li>
+              </ol>
+            </div>
+          </div>
+
+          {/* Grupos Telegram Conectados */}
+          <div style={{
+            background: 'rgba(15, 23, 42, 0.8)',
+            padding: '1.5rem',
+            borderRadius: '0.75rem',
+            border: '1px solid rgba(148, 163, 184, 0.1)',
+            marginBottom: '1.5rem'
+          }}>
+            <h3 style={{ color: '#F1F5F9', margin: '0 0 1.5rem 0', fontSize: '1.25rem', fontWeight: '600' }}>
+              📱 Grupos Telegram Conectados
+            </h3>
+            
+            <div style={{ display: 'grid', gap: '1rem' }}>
+              {[
+                { name: 'NexoCrypto Bot', status: 'Conectado', signals: 0, color: '#10B981', type: 'bot' },
+                { name: 'Aguardando grupos...', status: 'Pronto para conectar', signals: 0, color: '#94A3B8', type: 'waiting' }
+              ].map((group, index) => (
+                <div key={index} style={{
+                  background: 'rgba(148, 163, 184, 0.05)',
+                  padding: '1rem',
+                  borderRadius: '0.5rem',
+                  border: '1px solid rgba(148, 163, 184, 0.1)',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    <div style={{
+                      width: '12px',
+                      height: '12px',
+                      borderRadius: '50%',
+                      background: group.color,
+                      boxShadow: `0 0 8px ${group.color}50`
+                    }}></div>
+                    <div>
+                      <p style={{ color: '#F1F5F9', margin: '0 0 0.25rem 0', fontWeight: '500' }}>{group.name}</p>
+                      <p style={{ color: '#94A3B8', margin: 0, fontSize: '0.875rem' }}>{group.status}</p>
+                    </div>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <p style={{ color: '#F1F5F9', margin: '0 0 0.25rem 0', fontWeight: '500' }}>{group.signals}</p>
+                    <p style={{ color: '#94A3B8', margin: 0, fontSize: '0.875rem' }}>sinais</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <button style={{
+              background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+              color: 'white',
+              border: 'none',
+              padding: '0.75rem 1.5rem',
+              borderRadius: '0.5rem',
+              fontSize: '0.875rem',
+              fontWeight: '500',
+              cursor: 'pointer',
+              marginTop: '1rem',
+              width: '100%'
+            }}>
+              + Adicionar Grupo
             </button>
           </div>
 
-          {/* Status da Validação */}
+          {/* Estatísticas em Tempo Real */}
           <div style={{
-            background: isValidated ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-            border: `2px solid ${isValidated ? '#10B981' : '#EF4444'}`,
-            padding: '1rem',
-            borderRadius: '0.5rem',
-            textAlign: 'center'
+            background: 'rgba(15, 23, 42, 0.8)',
+            padding: '1.5rem',
+            borderRadius: '0.75rem',
+            border: '1px solid rgba(148, 163, 184, 0.1)',
+            marginBottom: '1.5rem'
           }}>
-            <p style={{ 
-              color: isValidated ? '#10B981' : '#EF4444',
-              margin: 0,
-              fontWeight: 'bold'
-            }}>
-              {isValidated ? '✅ VALIDADO' : '❌ NÃO VALIDADO'}
-            </p>
-            {isValidated && telegramUsername && (
-              <p style={{ color: '#94A3B8', margin: '0.5rem 0 0 0' }}>
-                Usuário: {telegramUsername}
-              </p>
-            )}
+            <h3 style={{ color: '#F1F5F9', margin: '0 0 1.5rem 0', fontSize: '1.25rem', fontWeight: '600' }}>
+              📊 Estatísticas em Tempo Real
+            </h3>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
+              <div style={{ textAlign: 'center' }}>
+                <p style={{ color: '#94A3B8', margin: '0 0 0.5rem 0', fontSize: '0.875rem' }}>Sinais Recebidos</p>
+                <p style={{ color: '#F1F5F9', margin: 0, fontSize: '1.75rem', fontWeight: 'bold' }}>23</p>
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <p style={{ color: '#94A3B8', margin: '0 0 0.5rem 0', fontSize: '0.875rem' }}>Executados</p>
+                <p style={{ color: '#10B981', margin: 0, fontSize: '1.75rem', fontWeight: 'bold' }}>18</p>
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <p style={{ color: '#94A3B8', margin: '0 0 0.5rem 0', fontSize: '0.875rem' }}>Rejeitados</p>
+                <p style={{ color: '#EF4444', margin: 0, fontSize: '1.75rem', fontWeight: 'bold' }}>5</p>
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <p style={{ color: '#94A3B8', margin: '0 0 0.5rem 0', fontSize: '0.875rem' }}>Taxa de Sucesso</p>
+                <p style={{ color: '#10B981', margin: 0, fontSize: '1.75rem', fontWeight: 'bold' }}>83%</p>
+              </div>
+            </div>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem' }}>
+              <div style={{ textAlign: 'center' }}>
+                <p style={{ color: '#94A3B8', margin: '0 0 0.5rem 0', fontSize: '0.875rem' }}>Precisão IA</p>
+                <p style={{ color: '#10B981', margin: 0, fontSize: '1.75rem', fontWeight: 'bold' }}>91%</p>
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <p style={{ color: '#94A3B8', margin: '0 0 0.5rem 0', fontSize: '0.875rem' }}>Saldo ByBit</p>
+                <p style={{ color: '#F1F5F9', margin: 0, fontSize: '1.75rem', fontWeight: 'bold' }}>2,450</p>
+                <p style={{ color: '#94A3B8', margin: 0, fontSize: '0.75rem' }}>USDT</p>
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <p style={{ color: '#94A3B8', margin: '0 0 0.5rem 0', fontSize: '0.875rem' }}>P&L Hoje</p>
+                <p style={{ color: '#10B981', margin: 0, fontSize: '1.75rem', fontWeight: 'bold' }}>+45.30</p>
+                <p style={{ color: '#94A3B8', margin: 0, fontSize: '0.75rem' }}>USDT</p>
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <p style={{ color: '#94A3B8', margin: '0 0 0.5rem 0', fontSize: '0.875rem' }}>P&L Total</p>
+                <p style={{ color: '#10B981', margin: 0, fontSize: '1.75rem', fontWeight: 'bold' }}>+1,247</p>
+                <p style={{ color: '#94A3B8', margin: 0, fontSize: '0.75rem' }}>USDT</p>
+              </div>
+            </div>
           </div>
-        </div>
 
-        {/* Instruções */}
-        <div style={{
-          background: 'rgba(59, 130, 246, 0.1)',
-          border: '2px solid #3B82F6',
-          padding: '1rem',
-          borderRadius: '0.5rem'
-        }}>
-          <h4 style={{ color: '#3B82F6', margin: '0 0 0.5rem 0' }}>
-            📋 Como validar:
-          </h4>
-          <ol style={{ color: '#94A3B8', margin: 0, paddingLeft: '1.5rem' }}>
-            <li>Copie o UUID acima</li>
-            <li>Acesse o bot: @nexocrypto_trading_bot</li>
-            <li>Digite: /validate [UUID]</li>
-            <li>Clique em "Verificar Validação"</li>
-          </ol>
-        </div>
+          {/* Últimas Operações */}
+          <div style={{
+            background: 'rgba(15, 23, 42, 0.8)',
+            padding: '1.5rem',
+            borderRadius: '0.75rem',
+            border: '1px solid rgba(148, 163, 184, 0.1)'
+          }}>
+            <h3 style={{ color: '#F1F5F9', margin: '0 0 1.5rem 0', fontSize: '1.25rem', fontWeight: '600' }}>
+              📈 Últimas Operações
+            </h3>
+            
+            <div style={{ display: 'grid', gap: '1rem' }}>
+              {[
+                { pair: 'BTCUSDT', type: 'LONG', result: '+2.3%', source: 'Binance Killers', color: '#10B981', time: '14:32', entry: '67,450', exit: '69,001' },
+                { pair: 'ETHUSDT', type: 'SHORT', result: '-1.1%', source: 'ByBit Pro', color: '#EF4444', time: '13:15', entry: '3,245', exit: '3,209' },
+                { pair: 'SOLUSDT', type: 'LONG', result: 'Em andamento', source: 'Binance Killers', color: '#F59E0B', time: '15:47', entry: '142.30', exit: '-' }
+              ].map((trade, index) => (
+                <div key={index} style={{
+                  background: 'rgba(148, 163, 184, 0.05)',
+                  padding: '1rem',
+                  borderRadius: '0.5rem',
+                  border: '1px solid rgba(148, 163, 184, 0.1)',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+                        <span style={{ color: '#F1F5F9', fontSize: '0.875rem', fontWeight: '600' }}>
+                          {trade.pair}
+                        </span>
+                        <span style={{
+                          background: trade.type === 'LONG' ? '#10B981' : '#EF4444',
+                          color: 'white',
+                          padding: '0.25rem 0.5rem',
+                          borderRadius: '0.25rem',
+                          fontSize: '0.75rem',
+                          fontWeight: '600'
+                        }}>
+                          {trade.type}
+                        </span>
+                      </div>
+                      <div style={{ display: 'flex', gap: '1rem', fontSize: '0.75rem', color: '#94A3B8' }}>
+                        <span>Entrada: {trade.entry}</span>
+                        <span>Saída: {trade.exit}</span>
+                        <span>{trade.time}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <p style={{ 
+                      color: trade.color, 
+                      margin: '0 0 0.25rem 0', 
+                      fontWeight: '600',
+                      fontSize: '0.875rem'
+                    }}>
+                      {trade.result}
+                    </p>
+                    <p style={{ color: '#94A3B8', margin: 0, fontSize: '0.75rem' }}>
+                      {trade.source}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       )}
 
@@ -1640,6 +2101,265 @@ function App() {
                   <span style={{ color: '#94A3B8', fontSize: '0.875rem' }}>
                     {article.date} às {article.time}
                   </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Aba Copy Trading */}
+      {activeTab === 'copytrading' && (
+        <div style={{
+          background: 'rgba(30, 41, 59, 0.8)',
+          padding: '2rem',
+          borderRadius: '1rem',
+          border: '1px solid rgba(148, 163, 184, 0.1)',
+          backdropFilter: 'blur(10px)',
+          marginBottom: '2rem'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+            <h2 style={{ color: '#F1F5F9', margin: 0, fontSize: '1.5rem', fontWeight: '600' }}>
+              👥 Copy Trading
+            </h2>
+            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+              <span style={{ color: '#94A3B8', fontSize: '0.875rem' }}>
+                Traders disponíveis: 12
+              </span>
+              <div style={{
+                background: 'rgba(16, 185, 129, 0.1)',
+                border: '1px solid rgba(16, 185, 129, 0.3)',
+                padding: '0.5rem 1rem',
+                borderRadius: '0.5rem',
+                color: '#10B981',
+                fontSize: '0.875rem',
+                fontWeight: '500'
+              }}>
+                Sistema Ativo
+              </div>
+            </div>
+          </div>
+
+          {/* Top Traders */}
+          <div style={{ display: 'grid', gap: '1.5rem' }}>
+            {[
+              { id: 1, name: 'CryptoMaster Pro', roi: '+187.3%', followers: 2847, winRate: '89.2%', trades: 156, risk: 'Médio', avatar: '🏆' },
+              { id: 2, name: 'Bitcoin Whale', roi: '+142.8%', followers: 1923, winRate: '84.7%', trades: 203, risk: 'Alto', avatar: '🐋' },
+              { id: 3, name: 'Altcoin Hunter', roi: '+98.5%', followers: 1456, winRate: '76.3%', trades: 89, risk: 'Baixo', avatar: '🎯' }
+            ].map(trader => (
+              <div key={trader.id} style={{
+                background: 'rgba(15, 23, 42, 0.8)',
+                padding: '1.5rem',
+                borderRadius: '0.75rem',
+                border: '1px solid rgba(148, 163, 184, 0.1)',
+                position: 'relative'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    <div style={{
+                      background: 'rgba(148, 163, 184, 0.1)',
+                      padding: '1rem',
+                      borderRadius: '50%',
+                      fontSize: '1.5rem'
+                    }}>
+                      {trader.avatar}
+                    </div>
+                    <div>
+                      <h3 style={{ color: '#F1F5F9', margin: '0 0 0.5rem 0', fontSize: '1.25rem', fontWeight: '600' }}>
+                        {trader.name}
+                      </h3>
+                      <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                        <span style={{ color: '#94A3B8', fontSize: '0.875rem' }}>
+                          {trader.followers} seguidores
+                        </span>
+                        <span style={{
+                          background: trader.risk === 'Alto' ? 'rgba(239, 68, 68, 0.15)' : trader.risk === 'Médio' ? 'rgba(245, 158, 11, 0.15)' : 'rgba(16, 185, 129, 0.15)',
+                          color: trader.risk === 'Alto' ? '#EF4444' : trader.risk === 'Médio' ? '#F59E0B' : '#10B981',
+                          padding: '0.25rem 0.75rem',
+                          borderRadius: '0.375rem',
+                          fontSize: '0.875rem',
+                          border: `1px solid ${trader.risk === 'Alto' ? 'rgba(239, 68, 68, 0.3)' : trader.risk === 'Médio' ? 'rgba(245, 158, 11, 0.3)' : 'rgba(16, 185, 129, 0.3)'}`
+                        }}>
+                          Risco {trader.risk}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <button style={{
+                    background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+                    color: 'white',
+                    border: 'none',
+                    padding: '0.75rem 1.5rem',
+                    borderRadius: '0.5rem',
+                    fontSize: '0.875rem',
+                    fontWeight: '500',
+                    cursor: 'pointer'
+                  }}>
+                    Copiar Trader
+                  </button>
+                </div>
+
+                <div style={{ 
+                  display: 'grid', 
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', 
+                  gap: '1rem',
+                  background: 'rgba(148, 163, 184, 0.05)',
+                  padding: '1rem',
+                  borderRadius: '0.5rem'
+                }}>
+                  <div style={{ textAlign: 'center' }}>
+                    <p style={{ color: '#94A3B8', margin: '0 0 0.25rem 0', fontSize: '0.875rem' }}>ROI (30 dias)</p>
+                    <p style={{ color: '#10B981', margin: 0, fontWeight: '600', fontSize: '1.1rem' }}>{trader.roi}</p>
+                  </div>
+                  <div style={{ textAlign: 'center' }}>
+                    <p style={{ color: '#94A3B8', margin: '0 0 0.25rem 0', fontSize: '0.875rem' }}>Win Rate</p>
+                    <p style={{ color: '#F1F5F9', margin: 0, fontWeight: '600', fontSize: '1.1rem' }}>{trader.winRate}</p>
+                  </div>
+                  <div style={{ textAlign: 'center' }}>
+                    <p style={{ color: '#94A3B8', margin: '0 0 0.25rem 0', fontSize: '0.875rem' }}>Trades</p>
+                    <p style={{ color: '#F1F5F9', margin: 0, fontWeight: '600', fontSize: '1.1rem' }}>{trader.trades}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Aba Cursos */}
+      {activeTab === 'courses' && (
+        <div style={{
+          background: 'rgba(30, 41, 59, 0.8)',
+          padding: '2rem',
+          borderRadius: '1rem',
+          border: '1px solid rgba(148, 163, 184, 0.1)',
+          backdropFilter: 'blur(10px)',
+          marginBottom: '2rem'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+            <h2 style={{ color: '#F1F5F9', margin: 0, fontSize: '1.5rem', fontWeight: '600' }}>
+              🎓 Cursos de Trading
+            </h2>
+            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+              <span style={{ color: '#94A3B8', fontSize: '0.875rem' }}>
+                12 cursos disponíveis
+              </span>
+              <div style={{
+                background: 'rgba(59, 130, 246, 0.1)',
+                border: '1px solid rgba(59, 130, 246, 0.3)',
+                padding: '0.5rem 1rem',
+                borderRadius: '0.5rem',
+                color: '#3B82F6',
+                fontSize: '0.875rem',
+                fontWeight: '500'
+              }}>
+                Novos Conteúdos
+              </div>
+            </div>
+          </div>
+
+          {/* Categorias de Cursos */}
+          <div style={{ display: 'grid', gap: '1.5rem' }}>
+            {[
+              { 
+                id: 1, 
+                title: 'Trading para Iniciantes', 
+                description: 'Aprenda os fundamentos do trading de criptomoedas do zero',
+                duration: '8 horas',
+                lessons: 24,
+                level: 'Iniciante',
+                price: 'Gratuito',
+                rating: 4.8,
+                students: 1247,
+                icon: '📚'
+              },
+              { 
+                id: 2, 
+                title: 'Análise Técnica Avançada', 
+                description: 'Domine indicadores, padrões gráficos e estratégias profissionais',
+                duration: '12 horas',
+                lessons: 36,
+                level: 'Avançado',
+                price: 'R$ 297',
+                rating: 4.9,
+                students: 892,
+                icon: '📈'
+              },
+              { 
+                id: 3, 
+                title: 'Gestão de Risco e Psicologia', 
+                description: 'Controle emocional e técnicas de gerenciamento de capital',
+                duration: '6 horas',
+                lessons: 18,
+                level: 'Intermediário',
+                price: 'R$ 197',
+                rating: 4.7,
+                students: 654,
+                icon: '🧠'
+              }
+            ].map(course => (
+              <div key={course.id} style={{
+                background: 'rgba(15, 23, 42, 0.8)',
+                padding: '1.5rem',
+                borderRadius: '0.75rem',
+                border: '1px solid rgba(148, 163, 184, 0.1)',
+                position: 'relative'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', flex: 1 }}>
+                    <div style={{
+                      background: 'rgba(59, 130, 246, 0.15)',
+                      padding: '1rem',
+                      borderRadius: '0.75rem',
+                      fontSize: '1.5rem',
+                      border: '1px solid rgba(59, 130, 246, 0.3)'
+                    }}>
+                      {course.icon}
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <h3 style={{ color: '#F1F5F9', margin: '0 0 0.5rem 0', fontSize: '1.25rem', fontWeight: '600' }}>
+                        {course.title}
+                      </h3>
+                      <p style={{ color: '#94A3B8', margin: '0 0 1rem 0', fontSize: '0.875rem', lineHeight: '1.5' }}>
+                        {course.description}
+                      </p>
+                      <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                        <span style={{
+                          background: course.level === 'Iniciante' ? 'rgba(16, 185, 129, 0.15)' : course.level === 'Intermediário' ? 'rgba(245, 158, 11, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+                          color: course.level === 'Iniciante' ? '#10B981' : course.level === 'Intermediário' ? '#F59E0B' : '#EF4444',
+                          padding: '0.25rem 0.75rem',
+                          borderRadius: '0.375rem',
+                          fontSize: '0.875rem',
+                          border: `1px solid ${course.level === 'Iniciante' ? 'rgba(16, 185, 129, 0.3)' : course.level === 'Intermediário' ? 'rgba(245, 158, 11, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`
+                        }}>
+                          {course.level}
+                        </span>
+                        <span style={{ color: '#94A3B8', fontSize: '0.875rem' }}>
+                          {course.duration} • {course.lessons} aulas
+                        </span>
+                        <span style={{ color: '#94A3B8', fontSize: '0.875rem' }}>
+                          ⭐ {course.rating} ({course.students} alunos)
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <p style={{ color: '#F1F5F9', fontSize: '1.25rem', fontWeight: 'bold', margin: '0 0 1rem 0' }}>
+                      {course.price}
+                    </p>
+                    <button style={{
+                      background: course.price === 'Gratuito' ? 'linear-gradient(135deg, #10B981 0%, #059669 100%)' : 'linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%)',
+                      color: 'white',
+                      border: 'none',
+                      padding: '0.75rem 1.5rem',
+                      borderRadius: '0.5rem',
+                      fontSize: '0.875rem',
+                      fontWeight: '500',
+                      cursor: 'pointer'
+                    }}>
+                      {course.price === 'Gratuito' ? 'Começar Agora' : 'Comprar Curso'}
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}

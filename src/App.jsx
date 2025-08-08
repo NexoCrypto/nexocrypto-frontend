@@ -54,7 +54,7 @@ function App() {
   // Função para gerar novo UUID
   const generateNewUUID = async () => {
     try {
-      const response = await fetch('http://localhost:5002/api/generate-uuid', {
+      const response = await fetch('https://nexocrypto-backend.onrender.com/api/telegram/generate-uuid', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -80,7 +80,7 @@ function App() {
     if (!currentUUID) return
     
     try {
-      const response = await fetch(`http://localhost:5002/api/check-validation/${currentUUID}`)
+      const response = await fetch(`https://nexocrypto-backend.onrender.com/api/telegram/check-validation/${currentUUID}`)
       
       if (response.ok) {
         const data = await response.json()

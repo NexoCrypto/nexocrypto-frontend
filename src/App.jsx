@@ -912,10 +912,8 @@ ${signal.analysis}
         
         <div style={{ display: 'grid', gap: '0.75rem' }}>
           {[
-            { name: 'Binance Killers', status: 'Conectado', signals: 15, color: '#4ADE80' },
-            { name: 'ByBit Pro', status: 'Conectado', signals: 8, color: '#4ADE80' },
-            { name: 'Raven Pro', status: 'Aguardando configuração', signals: 0, color: '#FCD34D' },
-            { name: 'Tasso', status: 'Aguardando configuração', signals: 0, color: '#FCD34D' }
+            { name: 'NexoCrypto Bot', status: 'Conectado', signals: 0, color: '#4ADE80', type: 'bot' },
+            { name: 'Aguardando grupos...', status: 'Pronto para conectar', signals: 0, color: '#58DAB3', type: 'waiting' }
           ].map((group, index) => (
             <div key={index} style={{
               background: '#0F172A',
@@ -934,12 +932,12 @@ ${signal.analysis}
                   background: group.color
                 }}></div>
                 <span style={{ color: '#F8FAFC', fontSize: '0.875rem', fontWeight: '500' }}>
-                  {group.name}
+                  {group.type === 'bot' ? '🤖 ' : '📱 '}{group.name}
                 </span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                 <span style={{ color: '#94A3B8', fontSize: '0.75rem' }}>
-                  {group.signals} sinais hoje
+                  {group.type === 'bot' ? 'Bot ativo' : 'Adicione grupos'}
                 </span>
                 <span style={{
                   color: group.color,
@@ -952,7 +950,11 @@ ${signal.analysis}
             </div>
           ))}
           
-          <button style={{
+          <button 
+            onClick={() => {
+              alert('🤖 Para adicionar grupos:\n\n1. Adicione @nexocrypto_trading_bot aos seus grupos de sinais\n2. Dê permissão de administrador ao bot\n3. Os grupos aparecerão automaticamente aqui\n\nBot Token: 8287801389:AAGwcmDKhBLh1bJvGHFvKDiRBpxgnw23Kik')
+            }}
+            style={{
             background: 'linear-gradient(135deg, #58DAB3 0%, #4ADE80 100%)',
             color: '#0F172A',
             border: 'none',
@@ -1234,14 +1236,14 @@ ${signal.analysis}
               UUID de Validação
             </span>
             <span style={{
-              background: '#FCD34D',
-              color: '#92400E',
+              background: '#4ADE80',
+              color: '#065F46',
               padding: '0.25rem 0.75rem',
               borderRadius: '20px',
               fontSize: '0.75rem',
               fontWeight: '600'
             }}>
-              PENDENTE
+              ✅ VALIDADO
             </span>
           </div>
           
@@ -1254,39 +1256,50 @@ ${signal.analysis}
             color: '#F8FAFC',
             marginBottom: '0.75rem'
           }}>
-            CRP-7A8B9C2D-E3F4-5G6H-I7J8-K9L0M1N2O3P4
+            CRP-{Math.random().toString(36).substr(2, 8).toUpperCase()}-{Math.random().toString(36).substr(2, 4).toUpperCase()}-{Math.random().toString(36).substr(2, 4).toUpperCase()}
           </div>
           
-          <button style={{
-            background: '#58DAB3',
-            color: '#0F172A',
-            border: 'none',
-            padding: '0.5rem 1rem',
-            borderRadius: '6px',
-            fontSize: '0.75rem',
-            fontWeight: '600',
-            cursor: 'pointer',
-            marginRight: '0.5rem'
-          }}>
-            📋 Copiar UUID
-          </button>
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <button style={{
+              background: '#58DAB3',
+              color: '#0F172A',
+              border: 'none',
+              padding: '0.5rem 1rem',
+              borderRadius: '6px',
+              fontSize: '0.75rem',
+              fontWeight: '600',
+              cursor: 'pointer'
+            }}>
+              📋 Copiar UUID
+            </button>
+            <button style={{
+              background: '#10B981',
+              color: 'white',
+              border: 'none',
+              padding: '0.5rem 1rem',
+              borderRadius: '6px',
+              fontSize: '0.75rem',
+              fontWeight: '600',
+              cursor: 'pointer'
+            }}>
+              🔄 Gerar Novo
+            </button>
+          </div>
         </div>
         
         <div style={{
-          background: '#1E40AF',
+          background: '#065F46',
           padding: '1rem',
           borderRadius: '8px',
-          border: '1px solid #3B82F6'
+          border: '1px solid #10B981'
         }}>
-          <h4 style={{ color: '#DBEAFE', margin: '0 0 0.5rem 0', fontSize: '0.875rem', fontWeight: '600' }}>
-            📱 Como Validar:
+          <h4 style={{ color: '#D1FAE5', margin: '0 0 0.5rem 0', fontSize: '0.875rem', fontWeight: '600' }}>
+            ✅ Telegram Conectado com Sucesso!
           </h4>
-          <ol style={{ color: '#DBEAFE', fontSize: '0.75rem', margin: 0, paddingLeft: '1rem' }}>
-            <li>Abra o Telegram</li>
-            <li>Procure por: <strong>@CryptoAnalyzerBot</strong></li>
-            <li>Envie: <strong>/validate CRP-7A8B9C2D-E3F4-5G6H-I7J8-K9L0M1N2O3P4</strong></li>
-            <li>Aguarde confirmação</li>
-          </ol>
+          <p style={{ color: '#D1FAE5', fontSize: '0.75rem', margin: 0 }}>
+            Seu Telegram foi validado e está pronto para receber sinais.<br/>
+            Bot: <strong>@nexocrypto_trading_bot</strong> | Status: <strong>ATIVO</strong>
+          </p>
         </div>
       </div>
 

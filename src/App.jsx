@@ -1966,6 +1966,7 @@ ${signal.analysis}
       </div>
     </div>
   )
+}
 
   // Renderização principal
   if (!isAuthenticated) {

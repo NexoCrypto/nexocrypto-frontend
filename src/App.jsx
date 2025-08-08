@@ -10,6 +10,8 @@ function App() {
   const [gems, setGems] = useState([])
   const [news, setNews] = useState([])
   const [loading, setLoading] = useState(false)
+  const [telegramUsername, setTelegramUsername] = useState('')
+  const [currentUUID, setCurrentUUID] = useState('')
 
   // Verificar se já está logado
   useEffect(() => {
@@ -48,6 +50,64 @@ function App() {
     setIsAuthenticated(false)
     setLoginForm({ username: '', password: '' })
   }
+
+  // Função para gerar novo UUID
+  const generateNewUUID = async () => {
+    try {
+      const response = await fetch('http://localhost:5002/api/generate-uuid', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      
+      if (response.ok) {
+        const data = await response.json()
+        setCurrentUUID(data.uuid)
+        // Limpa username anterior quando gera novo UUID
+        setTelegramUsername('')
+      }
+    } catch (error) {
+      console.error('Erro ao gerar UUID:', error)
+      // Fallback para UUID local se API não estiver disponível
+      const fallbackUUID = `CRP-${Math.random().toString(36).substr(2, 8).toUpperCase()}-${Math.random().toString(36).substr(2, 4).toUpperCase()}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`
+      setCurrentUUID(fallbackUUID)
+    }
+  }
+
+  // Função para verificar validação do Telegram
+  const checkTelegramValidation = async () => {
+    if (!currentUUID) return
+    
+    try {
+      const response = await fetch(`http://localhost:5002/api/check-validation/${currentUUID}`)
+      
+      if (response.ok) {
+        const data = await response.json()
+        if (data.success && data.validated && data.username) {
+          setTelegramUsername(data.username)
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao verificar validação:', error)
+    }
+  }
+
+  // Efeito para gerar UUID inicial e verificar validação periodicamente
+  useEffect(() => {
+    if (isAuthenticated && !currentUUID) {
+      generateNewUUID()
+    }
+  }, [isAuthenticated])
+
+  // Efeito para verificar validação do Telegram periodicamente
+  useEffect(() => {
+    if (currentUUID) {
+      checkTelegramValidation()
+      const interval = setInterval(checkTelegramValidation, 5000) // Verifica a cada 5 segundos
+      return () => clearInterval(interval)
+    }
+  }, [currentUUID])
 
   // Dados atualizados com preços reais de 07/08/2025
   const mockSignals = [
@@ -1256,7 +1316,7 @@ ${signal.analysis}
             color: '#F8FAFC',
             marginBottom: '0.75rem'
           }}>
-            CRP-{Math.random().toString(36).substr(2, 8).toUpperCase()}-{Math.random().toString(36).substr(2, 4).toUpperCase()}-{Math.random().toString(36).substr(2, 4).toUpperCase()}
+            {currentUUID || 'Gerando UUID...'}
           </div>
           
           <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -1272,7 +1332,9 @@ ${signal.analysis}
             }}>
               📋 Copiar UUID
             </button>
-            <button style={{
+            <button 
+              onClick={generateNewUUID}
+              style={{
               background: '#10B981',
               color: 'white',
               border: 'none',
@@ -1287,20 +1349,23 @@ ${signal.analysis}
           </div>
         </div>
         
-        <div style={{
-          background: '#065F46',
-          padding: '1rem',
-          borderRadius: '8px',
-          border: '1px solid #10B981'
-        }}>
-          <h4 style={{ color: '#D1FAE5', margin: '0 0 0.5rem 0', fontSize: '0.875rem', fontWeight: '600' }}>
-            ✅ Telegram Conectado com Sucesso!
-          </h4>
-          <p style={{ color: '#D1FAE5', fontSize: '0.75rem', margin: 0 }}>
-            Seu Telegram foi validado e está pronto para receber sinais.<br/>
-            Bot: <strong>@nexocrypto_trading_bot</strong> | Status: <strong>ATIVO</strong>
-          </p>
-        </div>
+        {telegramUsername && (
+          <div style={{
+            background: '#065F46',
+            padding: '1rem',
+            borderRadius: '8px',
+            border: '1px solid #10B981'
+          }}>
+            <h4 style={{ color: '#D1FAE5', margin: '0 0 0.5rem 0', fontSize: '0.875rem', fontWeight: '600' }}>
+              ✅ Telegram Conectado com Sucesso!
+            </h4>
+            <p style={{ color: '#D1FAE5', fontSize: '0.75rem', margin: 0 }}>
+              Seu Telegram foi validado e está pronto para receber sinais.<br/>
+              <strong>Username:</strong> @{telegramUsername}<br/>
+              Bot: <strong>@nexocrypto_trading_bot</strong> | Status: <strong>ATIVO</strong>
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Botões de Ação */}

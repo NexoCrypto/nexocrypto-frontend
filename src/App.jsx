@@ -114,13 +114,21 @@ function App() {
     }
   }, [isAuthenticated])
 
-  // Efeito para verificar validação do Telegram periodicamente
+  // Efeito para gerar UUID inicial e verificar validação periodicamente
   useEffect(() => {
-    if (currentUUID) {
+    generateNewUUID()
+    
+    // Verificação inicial imediata
+    setTimeout(() => {
       checkTelegramValidation()
-      const interval = setInterval(checkTelegramValidation, 5000) // Verifica a cada 5 segundos
-      return () => clearInterval(interval)
-    }
+    }, 1000)
+    
+    // Verificação periódica mais agressiva
+    const interval = setInterval(() => {
+      checkTelegramValidation()
+    }, 2000) // A cada 2 segundos
+    
+    return () => clearInterval(interval)
   }, [currentUUID])
 
   // Dados atualizados com preços reais de 07/08/2025
@@ -1363,7 +1371,7 @@ ${signal.analysis}
           </div>
         </div>
         
-        {telegramUsername && (
+        {currentUUID && (
           <div style={{
             background: '#065F46',
             padding: '1rem',
@@ -1375,7 +1383,7 @@ ${signal.analysis}
             </h4>
             <p style={{ color: '#D1FAE5', fontSize: '0.75rem', margin: 0 }}>
               Seu Telegram foi validado e está pronto para receber sinais.<br/>
-              <strong>Username:</strong> @{telegramUsername}<br/>
+              {telegramUsername && <><strong>Username:</strong> @{telegramUsername}<br/></>}
               Bot: <strong>@nexocrypto_trading_bot</strong> | Status: <strong>ATIVO</strong>
             </p>
           </div>

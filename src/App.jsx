@@ -146,8 +146,7 @@ function App() {
       setCurrentUUID(fallbackUUID)
     }
     
-    // Mostra alerta de desconexão
-    alert('Novo UUID gerado! Telegram desconectado. Use o novo UUID para reconectar.')
+    // UUID gerado silenciosamente (sem alerta automático)
   }
 
   // Função para desconectar Telegram

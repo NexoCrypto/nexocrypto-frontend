@@ -84,7 +84,8 @@ function App() {
       'CRP-KTT5GM69-120S-9C19': 'usuario_teste',
       'CRP-2W8VDH60-K49P-AEE4': 'nexocrypto_user',
       'CRP-HN6952FJ-N0FJ-P4DB': 'admin_nexocrypto',
-      'CRP-3ARV6U0G-DHNL-ZZ75': 'telegram_user'
+      'CRP-3ARV6U0G-DHNL-ZZ75': 'telegram_user',
+      'CRP-DE109FV4-J825-70NA': 'nexocrypto_admin'
     }
     
     // Se temos dados mock para este UUID, usar diretamente

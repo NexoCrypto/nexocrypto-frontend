@@ -841,33 +841,41 @@ function App() {
       {/* Navigation Tabs */}
       <div style={{
         display: 'flex',
-        gap: '1rem',
+        gap: '0.5rem',
         marginBottom: '2rem',
-        overflowX: 'auto'
+        overflowX: 'auto',
+        background: 'rgba(15, 23, 42, 0.6)',
+        padding: '0.5rem',
+        borderRadius: '0.75rem',
+        border: '1px solid rgba(148, 163, 184, 0.1)'
       }}>
         {[
-          { id: 'dashboard', label: '🏠 Dashboard', color: '#10B981' },
-          { id: 'signals', label: '📊 Sinais', color: '#3B82F6' },
-          { id: 'gems', label: '💎 Gems', color: '#F59E0B' },
-          { id: 'news', label: '📰 Notícias', color: '#EF4444' },
-          { id: 'autotrading', label: '🤖 Auto Trading', color: '#8B5CF6' }
+          { id: 'dashboard', label: 'Dashboard', icon: '⚡' },
+          { id: 'signals', label: 'Sinais', icon: '📈' },
+          { id: 'gems', label: 'Gems', icon: '💎' },
+          { id: 'news', label: 'Notícias', icon: '📰' },
+          { id: 'autotrading', label: 'Auto Trading', icon: '🤖' }
         ].map(tab => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             style={{
-              padding: '0.75rem 1.5rem',
+              padding: '0.75rem 1.25rem',
               borderRadius: '0.5rem',
-              border: activeTab === tab.id ? `2px solid ${tab.color}` : '2px solid transparent',
-              background: activeTab === tab.id ? `${tab.color}20` : 'rgba(30, 41, 59, 0.8)',
-              color: activeTab === tab.id ? tab.color : '#94A3B8',
-              fontSize: '1rem',
-              fontWeight: activeTab === tab.id ? 'bold' : 'normal',
+              border: 'none',
+              background: activeTab === tab.id ? 'rgba(148, 163, 184, 0.15)' : 'transparent',
+              color: activeTab === tab.id ? '#F1F5F9' : '#94A3B8',
+              fontSize: '0.875rem',
+              fontWeight: activeTab === tab.id ? '600' : '400',
               cursor: 'pointer',
               whiteSpace: 'nowrap',
-              transition: 'all 0.3s ease'
+              transition: 'all 0.2s ease',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem'
             }}
           >
+            <span style={{ fontSize: '1rem' }}>{tab.icon}</span>
             {tab.label}
           </button>
         ))}
@@ -883,51 +891,285 @@ function App() {
           backdropFilter: 'blur(10px)',
           marginBottom: '2rem'
         }}>
-          <h2 style={{ color: '#10B981', marginBottom: '1.5rem' }}>
-            🏠 Dashboard Principal
-          </h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem' }}>
-            <div style={{
-              background: 'rgba(16, 185, 129, 0.1)',
-              border: '2px solid #10B981',
-              padding: '1rem',
-              borderRadius: '0.5rem',
-              textAlign: 'center'
-            }}>
-              <h3 style={{ color: '#10B981', margin: '0 0 0.5rem 0' }}>Sinais Ativos</h3>
-              <p style={{ color: '#F1F5F9', fontSize: '2rem', fontWeight: 'bold', margin: 0 }}>3</p>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+            <h2 style={{ color: '#F1F5F9', margin: 0, fontSize: '1.5rem', fontWeight: '600' }}>
+              ⚡ Dashboard Principal
+            </h2>
+            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+              <div style={{
+                background: 'rgba(16, 185, 129, 0.1)',
+                border: '1px solid rgba(16, 185, 129, 0.3)',
+                padding: '0.5rem 1rem',
+                borderRadius: '0.5rem',
+                color: '#10B981',
+                fontSize: '0.875rem',
+                fontWeight: '500'
+              }}>
+                Sistema Online
+              </div>
+              <span style={{ color: '#94A3B8', fontSize: '0.875rem' }}>
+                Última atualização: 08/08/2025 17:35
+              </span>
             </div>
+          </div>
+
+          {/* Estatísticas Principais */}
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
+            gap: '1.5rem', 
+            marginBottom: '2rem' 
+          }}>
             <div style={{
-              background: 'rgba(59, 130, 246, 0.1)',
-              border: '2px solid #3B82F6',
-              padding: '1rem',
-              borderRadius: '0.5rem',
-              textAlign: 'center'
+              background: 'rgba(15, 23, 42, 0.8)',
+              padding: '1.5rem',
+              borderRadius: '0.75rem',
+              border: '1px solid rgba(148, 163, 184, 0.1)',
+              position: 'relative'
             }}>
-              <h3 style={{ color: '#3B82F6', margin: '0 0 0.5rem 0' }}>Gems Descobertas</h3>
-              <p style={{ color: '#F1F5F9', fontSize: '2rem', fontWeight: 'bold', margin: 0 }}>3</p>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+                <div>
+                  <p style={{ color: '#94A3B8', margin: '0 0 0.5rem 0', fontSize: '0.875rem' }}>Sinais Ativos</p>
+                  <p style={{ color: '#F1F5F9', fontSize: '2rem', fontWeight: 'bold', margin: 0 }}>3</p>
+                </div>
+                <div style={{
+                  background: 'rgba(16, 185, 129, 0.15)',
+                  padding: '0.5rem',
+                  borderRadius: '0.5rem',
+                  border: '1px solid rgba(16, 185, 129, 0.3)'
+                }}>
+                  <span style={{ color: '#10B981', fontSize: '1.25rem' }}>📈</span>
+                </div>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ color: '#94A3B8', fontSize: '0.875rem' }}>Taxa de sucesso</span>
+                <span style={{ color: '#10B981', fontSize: '0.875rem', fontWeight: '500' }}>87.5%</span>
+              </div>
+              <div style={{
+                background: 'rgba(148, 163, 184, 0.1)',
+                height: '4px',
+                borderRadius: '2px',
+                marginTop: '0.5rem',
+                overflow: 'hidden'
+              }}>
+                <div style={{
+                  background: '#10B981',
+                  height: '100%',
+                  width: '87.5%',
+                  borderRadius: '2px'
+                }}></div>
+              </div>
             </div>
+
             <div style={{
-              background: 'rgba(245, 158, 11, 0.1)',
-              border: '2px solid #F59E0B',
-              padding: '1rem',
-              borderRadius: '0.5rem',
-              textAlign: 'center'
+              background: 'rgba(15, 23, 42, 0.8)',
+              padding: '1.5rem',
+              borderRadius: '0.75rem',
+              border: '1px solid rgba(148, 163, 184, 0.1)',
+              position: 'relative'
             }}>
-              <h3 style={{ color: '#F59E0B', margin: '0 0 0.5rem 0' }}>Notícias Hoje</h3>
-              <p style={{ color: '#F1F5F9', fontSize: '2rem', fontWeight: 'bold', margin: 0 }}>3</p>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+                <div>
+                  <p style={{ color: '#94A3B8', margin: '0 0 0.5rem 0', fontSize: '0.875rem' }}>Gems Descobertas</p>
+                  <p style={{ color: '#F1F5F9', fontSize: '2rem', fontWeight: 'bold', margin: 0 }}>3</p>
+                </div>
+                <div style={{
+                  background: 'rgba(245, 158, 11, 0.15)',
+                  padding: '0.5rem',
+                  borderRadius: '0.5rem',
+                  border: '1px solid rgba(245, 158, 11, 0.3)'
+                }}>
+                  <span style={{ color: '#F59E0B', fontSize: '1.25rem' }}>💎</span>
+                </div>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ color: '#94A3B8', fontSize: '0.875rem' }}>Potencial médio</span>
+                <span style={{ color: '#F59E0B', fontSize: '0.875rem', fontWeight: '500' }}>+450%</span>
+              </div>
+              <div style={{
+                background: 'rgba(148, 163, 184, 0.1)',
+                height: '4px',
+                borderRadius: '2px',
+                marginTop: '0.5rem',
+                overflow: 'hidden'
+              }}>
+                <div style={{
+                  background: '#F59E0B',
+                  height: '100%',
+                  width: '75%',
+                  borderRadius: '2px'
+                }}></div>
+              </div>
             </div>
+
             <div style={{
-              background: isValidated ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-              border: `2px solid ${isValidated ? '#10B981' : '#EF4444'}`,
-              padding: '1rem',
-              borderRadius: '0.5rem',
-              textAlign: 'center'
+              background: 'rgba(15, 23, 42, 0.8)',
+              padding: '1.5rem',
+              borderRadius: '0.75rem',
+              border: '1px solid rgba(148, 163, 184, 0.1)',
+              position: 'relative'
             }}>
-              <h3 style={{ color: isValidated ? '#10B981' : '#EF4444', margin: '0 0 0.5rem 0' }}>Auto Trading</h3>
-              <p style={{ color: '#F1F5F9', fontSize: '1.2rem', fontWeight: 'bold', margin: 0 }}>
-                {isValidated ? '✅ ATIVO' : '❌ INATIVO'}
-              </p>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+                <div>
+                  <p style={{ color: '#94A3B8', margin: '0 0 0.5rem 0', fontSize: '0.875rem' }}>Notícias Hoje</p>
+                  <p style={{ color: '#F1F5F9', fontSize: '2rem', fontWeight: 'bold', margin: 0 }}>3</p>
+                </div>
+                <div style={{
+                  background: 'rgba(59, 130, 246, 0.15)',
+                  padding: '0.5rem',
+                  borderRadius: '0.5rem',
+                  border: '1px solid rgba(59, 130, 246, 0.3)'
+                }}>
+                  <span style={{ color: '#3B82F6', fontSize: '1.25rem' }}>📰</span>
+                </div>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ color: '#94A3B8', fontSize: '0.875rem' }}>Impacto alto</span>
+                <span style={{ color: '#3B82F6', fontSize: '0.875rem', fontWeight: '500' }}>2 notícias</span>
+              </div>
+              <div style={{
+                background: 'rgba(148, 163, 184, 0.1)',
+                height: '4px',
+                borderRadius: '2px',
+                marginTop: '0.5rem',
+                overflow: 'hidden'
+              }}>
+                <div style={{
+                  background: '#3B82F6',
+                  height: '100%',
+                  width: '66%',
+                  borderRadius: '2px'
+                }}></div>
+              </div>
+            </div>
+
+            <div style={{
+              background: 'rgba(15, 23, 42, 0.8)',
+              padding: '1.5rem',
+              borderRadius: '0.75rem',
+              border: '1px solid rgba(148, 163, 184, 0.1)',
+              position: 'relative'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+                <div>
+                  <p style={{ color: '#94A3B8', margin: '0 0 0.5rem 0', fontSize: '0.875rem' }}>Auto Trading</p>
+                  <p style={{ color: isValidated ? '#10B981' : '#EF4444', fontSize: '1.25rem', fontWeight: 'bold', margin: 0 }}>
+                    {isValidated ? 'ATIVO' : 'INATIVO'}
+                  </p>
+                </div>
+                <div style={{
+                  background: isValidated ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+                  padding: '0.5rem',
+                  borderRadius: '0.5rem',
+                  border: `1px solid ${isValidated ? 'rgba(16, 185, 129, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`
+                }}>
+                  <span style={{ color: isValidated ? '#10B981' : '#EF4444', fontSize: '1.25rem' }}>🤖</span>
+                </div>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ color: '#94A3B8', fontSize: '0.875rem' }}>Status Telegram</span>
+                <span style={{ color: isValidated ? '#10B981' : '#EF4444', fontSize: '0.875rem', fontWeight: '500' }}>
+                  {isValidated ? 'Validado' : 'Não validado'}
+                </span>
+              </div>
+              <div style={{
+                background: 'rgba(148, 163, 184, 0.1)',
+                height: '4px',
+                borderRadius: '2px',
+                marginTop: '0.5rem',
+                overflow: 'hidden'
+              }}>
+                <div style={{
+                  background: isValidated ? '#10B981' : '#EF4444',
+                  height: '100%',
+                  width: isValidated ? '100%' : '0%',
+                  borderRadius: '2px'
+                }}></div>
+              </div>
+            </div>
+          </div>
+
+          {/* Status Detalhado dos Sistemas */}
+          <div style={{ marginBottom: '2rem' }}>
+            <h3 style={{ color: '#F1F5F9', marginBottom: '1rem', fontSize: '1.25rem', fontWeight: '600' }}>
+              Status dos Sistemas
+            </h3>
+            <div style={{ display: 'grid', gap: '1rem' }}>
+              {[
+                { name: 'API de Sinais', status: 'online', uptime: '99.9%', lastCheck: '17:35', description: 'Monitoramento de sinais em tempo real' },
+                { name: 'Bot Telegram', status: 'online', uptime: '98.7%', lastCheck: '17:34', description: '@nexocrypto_trading_bot ativo' },
+                { name: 'Análise de Gems', status: 'online', uptime: '99.2%', lastCheck: '17:33', description: 'Varredura automática de oportunidades' },
+                { name: 'Feed de Notícias', status: 'online', uptime: '99.8%', lastCheck: '17:35', description: 'Agregação de fontes confiáveis' },
+                { name: 'Auto Trading', status: isValidated ? 'online' : 'offline', uptime: isValidated ? '100%' : '0%', lastCheck: isValidated ? '17:35' : 'N/A', description: 'Aguardando validação Telegram' }
+              ].map((system, index) => (
+                <div key={index} style={{
+                  background: 'rgba(15, 23, 42, 0.8)',
+                  padding: '1rem',
+                  borderRadius: '0.5rem',
+                  border: '1px solid rgba(148, 163, 184, 0.1)',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    <div style={{
+                      width: '12px',
+                      height: '12px',
+                      borderRadius: '50%',
+                      background: system.status === 'online' ? '#10B981' : '#EF4444',
+                      boxShadow: `0 0 8px ${system.status === 'online' ? '#10B981' : '#EF4444'}50`
+                    }}></div>
+                    <div>
+                      <p style={{ color: '#F1F5F9', margin: '0 0 0.25rem 0', fontWeight: '500' }}>{system.name}</p>
+                      <p style={{ color: '#94A3B8', margin: 0, fontSize: '0.875rem' }}>{system.description}</p>
+                    </div>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <p style={{ 
+                      color: system.status === 'online' ? '#10B981' : '#EF4444', 
+                      margin: '0 0 0.25rem 0', 
+                      fontWeight: '500',
+                      textTransform: 'uppercase',
+                      fontSize: '0.875rem'
+                    }}>
+                      {system.status}
+                    </p>
+                    <p style={{ color: '#94A3B8', margin: 0, fontSize: '0.875rem' }}>
+                      Uptime: {system.uptime} | {system.lastCheck}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Resumo de Performance */}
+          <div style={{
+            background: 'rgba(15, 23, 42, 0.8)',
+            padding: '1.5rem',
+            borderRadius: '0.75rem',
+            border: '1px solid rgba(148, 163, 184, 0.1)'
+          }}>
+            <h3 style={{ color: '#F1F5F9', marginBottom: '1rem', fontSize: '1.25rem', fontWeight: '600' }}>
+              Performance Geral
+            </h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem' }}>
+              <div style={{ textAlign: 'center' }}>
+                <p style={{ color: '#94A3B8', margin: '0 0 0.5rem 0', fontSize: '0.875rem' }}>Lucro Total (30 dias)</p>
+                <p style={{ color: '#10B981', fontSize: '1.75rem', fontWeight: 'bold', margin: 0 }}>+24.7%</p>
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <p style={{ color: '#94A3B8', margin: '0 0 0.5rem 0', fontSize: '0.875rem' }}>Trades Executados</p>
+                <p style={{ color: '#F1F5F9', fontSize: '1.75rem', fontWeight: 'bold', margin: 0 }}>127</p>
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <p style={{ color: '#94A3B8', margin: '0 0 0.5rem 0', fontSize: '0.875rem' }}>Win Rate</p>
+                <p style={{ color: '#10B981', fontSize: '1.75rem', fontWeight: 'bold', margin: 0 }}>84.3%</p>
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <p style={{ color: '#94A3B8', margin: '0 0 0.5rem 0', fontSize: '0.875rem' }}>Sharpe Ratio</p>
+                <p style={{ color: '#F1F5F9', fontSize: '1.75rem', fontWeight: 'bold', margin: 0 }}>2.14</p>
+              </div>
             </div>
           </div>
         </div>
@@ -1058,77 +1300,211 @@ function App() {
           backdropFilter: 'blur(10px)',
           marginBottom: '2rem'
         }}>
-          <h2 style={{ color: '#3B82F6', marginBottom: '1.5rem' }}>
-            📊 Sinais de Trading
-          </h2>
-          <div style={{ display: 'grid', gap: '1rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+            <h2 style={{ color: '#F1F5F9', margin: 0, fontSize: '1.5rem', fontWeight: '600' }}>
+              📈 Sinais de Trading
+            </h2>
+            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+              <span style={{ color: '#94A3B8', fontSize: '0.875rem' }}>
+                Última atualização: 08/08/2025 17:35
+              </span>
+              <div style={{
+                background: 'rgba(16, 185, 129, 0.1)',
+                border: '1px solid rgba(16, 185, 129, 0.3)',
+                padding: '0.5rem 1rem',
+                borderRadius: '0.5rem',
+                color: '#10B981',
+                fontSize: '0.875rem',
+                fontWeight: '500'
+              }}>
+                3 Sinais Ativos
+              </div>
+            </div>
+          </div>
+
+          {/* Estatísticas dos Sinais */}
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
+            gap: '1rem', 
+            marginBottom: '2rem' 
+          }}>
+            <div style={{
+              background: 'rgba(15, 23, 42, 0.8)',
+              padding: '1rem',
+              borderRadius: '0.5rem',
+              border: '1px solid rgba(148, 163, 184, 0.1)',
+              textAlign: 'center'
+            }}>
+              <p style={{ color: '#94A3B8', margin: '0 0 0.5rem 0', fontSize: '0.875rem' }}>Taxa de Sucesso</p>
+              <p style={{ color: '#10B981', fontSize: '1.5rem', fontWeight: 'bold', margin: 0 }}>87.5%</p>
+            </div>
+            <div style={{
+              background: 'rgba(15, 23, 42, 0.8)',
+              padding: '1rem',
+              borderRadius: '0.5rem',
+              border: '1px solid rgba(148, 163, 184, 0.1)',
+              textAlign: 'center'
+            }}>
+              <p style={{ color: '#94A3B8', margin: '0 0 0.5rem 0', fontSize: '0.875rem' }}>Lucro Médio</p>
+              <p style={{ color: '#10B981', fontSize: '1.5rem', fontWeight: 'bold', margin: 0 }}>+12.3%</p>
+            </div>
+            <div style={{
+              background: 'rgba(15, 23, 42, 0.8)',
+              padding: '1rem',
+              borderRadius: '0.5rem',
+              border: '1px solid rgba(148, 163, 184, 0.1)',
+              textAlign: 'center'
+            }}>
+              <p style={{ color: '#94A3B8', margin: '0 0 0.5rem 0', fontSize: '0.875rem' }}>Sinais Hoje</p>
+              <p style={{ color: '#F1F5F9', fontSize: '1.5rem', fontWeight: 'bold', margin: 0 }}>8</p>
+            </div>
+            <div style={{
+              background: 'rgba(15, 23, 42, 0.8)',
+              padding: '1rem',
+              borderRadius: '0.5rem',
+              border: '1px solid rgba(148, 163, 184, 0.1)',
+              textAlign: 'center'
+            }}>
+              <p style={{ color: '#94A3B8', margin: '0 0 0.5rem 0', fontSize: '0.875rem' }}>Volume Total</p>
+              <p style={{ color: '#F1F5F9', fontSize: '1.5rem', fontWeight: 'bold', margin: 0 }}>$2.4M</p>
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gap: '1.5rem' }}>
             {mockSignals.map(signal => (
               <div key={signal.id} style={{
                 background: 'rgba(15, 23, 42, 0.8)',
                 padding: '1.5rem',
-                borderRadius: '0.5rem',
-                border: `2px solid ${signal.type === 'LONG' ? '#10B981' : '#EF4444'}`
+                borderRadius: '0.75rem',
+                border: '1px solid rgba(148, 163, 184, 0.1)',
+                position: 'relative'
               }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                  <h3 style={{ color: '#F1F5F9', margin: 0 }}>{signal.symbol}</h3>
-                  <span style={{
-                    background: signal.type === 'LONG' ? '#10B981' : '#EF4444',
-                    color: 'white',
-                    padding: '0.25rem 0.75rem',
-                    borderRadius: '0.25rem',
-                    fontSize: '0.875rem',
-                    fontWeight: 'bold'
-                  }}>
-                    {signal.type}
-                  </span>
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem', marginBottom: '1rem' }}>
+                {/* Header do Sinal */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
                   <div>
-                    <p style={{ color: '#94A3B8', margin: '0 0 0.25rem 0', fontSize: '0.875rem' }}>Entrada:</p>
-                    <p style={{ color: '#F1F5F9', margin: 0, fontWeight: 'bold' }}>${signal.entry}</p>
-                  </div>
-                  <div>
-                    <p style={{ color: '#94A3B8', margin: '0 0 0.25rem 0', fontSize: '0.875rem' }}>Preço Atual:</p>
-                    <p style={{ color: '#F1F5F9', margin: 0, fontWeight: 'bold' }}>${signal.currentPrice}</p>
-                  </div>
-                  <div>
-                    <p style={{ color: '#94A3B8', margin: '0 0 0.25rem 0', fontSize: '0.875rem' }}>Stop Loss:</p>
-                    <p style={{ color: '#EF4444', margin: 0, fontWeight: 'bold' }}>${signal.stopLoss}</p>
-                  </div>
-                  <div>
-                    <p style={{ color: '#94A3B8', margin: '0 0 0.25rem 0', fontSize: '0.875rem' }}>Confiança:</p>
-                    <p style={{ color: '#10B981', margin: 0, fontWeight: 'bold' }}>{signal.confidence}%</p>
-                  </div>
-                </div>
-                <div style={{ marginBottom: '1rem' }}>
-                  <p style={{ color: '#94A3B8', margin: '0 0 0.5rem 0', fontSize: '0.875rem' }}>Targets:</p>
-                  <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    {signal.targets.map((target, index) => (
-                      <span key={index} style={{
-                        background: 'rgba(16, 185, 129, 0.2)',
-                        color: '#10B981',
-                        padding: '0.25rem 0.5rem',
-                        borderRadius: '0.25rem',
+                    <h3 style={{ color: '#F1F5F9', margin: '0 0 0.5rem 0', fontSize: '1.25rem', fontWeight: '600' }}>
+                      {signal.symbol}
+                    </h3>
+                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                      <span style={{
+                        background: signal.type === 'LONG' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+                        color: signal.type === 'LONG' ? '#10B981' : '#EF4444',
+                        padding: '0.25rem 0.75rem',
+                        borderRadius: '0.375rem',
+                        fontSize: '0.875rem',
+                        fontWeight: '500',
+                        border: `1px solid ${signal.type === 'LONG' ? 'rgba(16, 185, 129, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`
+                      }}>
+                        {signal.type}
+                      </span>
+                      <span style={{
+                        background: 'rgba(148, 163, 184, 0.1)',
+                        color: '#94A3B8',
+                        padding: '0.25rem 0.75rem',
+                        borderRadius: '0.375rem',
                         fontSize: '0.875rem'
                       }}>
-                        ${target}
+                        Confiança: {signal.confidence}%
                       </span>
+                      <span style={{
+                        background: signal.status === 'Lucro' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(59, 130, 246, 0.15)',
+                        color: signal.status === 'Lucro' ? '#10B981' : '#3B82F6',
+                        padding: '0.25rem 0.75rem',
+                        borderRadius: '0.375rem',
+                        fontSize: '0.875rem',
+                        border: `1px solid ${signal.status === 'Lucro' ? 'rgba(16, 185, 129, 0.3)' : 'rgba(59, 130, 246, 0.3)'}`
+                      }}>
+                        {signal.status}
+                      </span>
+                    </div>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <p style={{ color: '#94A3B8', margin: '0 0 0.25rem 0', fontSize: '0.875rem' }}>
+                      {signal.date} às {signal.time}
+                    </p>
+                    <p style={{ color: '#94A3B8', margin: 0, fontSize: '0.875rem' }}>
+                      ID: #{signal.id.toString().padStart(4, '0')}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Dados de Preço */}
+                <div style={{ 
+                  display: 'grid', 
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', 
+                  gap: '1rem', 
+                  marginBottom: '1.5rem',
+                  background: 'rgba(148, 163, 184, 0.05)',
+                  padding: '1rem',
+                  borderRadius: '0.5rem'
+                }}>
+                  <div>
+                    <p style={{ color: '#94A3B8', margin: '0 0 0.25rem 0', fontSize: '0.875rem' }}>Preço de Entrada</p>
+                    <p style={{ color: '#F1F5F9', margin: 0, fontWeight: '600', fontSize: '1.1rem' }}>${signal.entry}</p>
+                  </div>
+                  <div>
+                    <p style={{ color: '#94A3B8', margin: '0 0 0.25rem 0', fontSize: '0.875rem' }}>Preço Atual</p>
+                    <p style={{ color: '#F1F5F9', margin: 0, fontWeight: '600', fontSize: '1.1rem' }}>${signal.currentPrice}</p>
+                  </div>
+                  <div>
+                    <p style={{ color: '#94A3B8', margin: '0 0 0.25rem 0', fontSize: '0.875rem' }}>Stop Loss</p>
+                    <p style={{ color: '#EF4444', margin: 0, fontWeight: '600', fontSize: '1.1rem' }}>${signal.stopLoss}</p>
+                  </div>
+                  <div>
+                    <p style={{ color: '#94A3B8', margin: '0 0 0.25rem 0', fontSize: '0.875rem' }}>P&L Atual</p>
+                    <p style={{ 
+                      color: signal.type === 'LONG' ? '#10B981' : '#EF4444', 
+                      margin: 0, 
+                      fontWeight: '600', 
+                      fontSize: '1.1rem' 
+                    }}>
+                      {signal.type === 'LONG' ? '+2.1%' : '+1.1%'}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Targets */}
+                <div style={{ marginBottom: '1rem' }}>
+                  <p style={{ color: '#94A3B8', margin: '0 0 0.75rem 0', fontSize: '0.875rem', fontWeight: '500' }}>
+                    Targets de Lucro:
+                  </p>
+                  <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                    {signal.targets.map((target, index) => (
+                      <div key={index} style={{
+                        background: 'rgba(16, 185, 129, 0.1)',
+                        border: '1px solid rgba(16, 185, 129, 0.3)',
+                        color: '#10B981',
+                        padding: '0.5rem 1rem',
+                        borderRadius: '0.375rem',
+                        fontSize: '0.875rem',
+                        fontWeight: '500',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem'
+                      }}>
+                        <span style={{ fontSize: '0.75rem', opacity: 0.7 }}>T{index + 1}</span>
+                        ${target}
+                      </div>
                     ))}
                   </div>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ color: '#94A3B8', fontSize: '0.875rem' }}>
-                    {signal.date} às {signal.time}
-                  </span>
-                  <span style={{
-                    background: signal.status === 'Lucro' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(59, 130, 246, 0.2)',
-                    color: signal.status === 'Lucro' ? '#10B981' : '#3B82F6',
-                    padding: '0.25rem 0.75rem',
-                    borderRadius: '0.25rem',
-                    fontSize: '0.875rem'
-                  }}>
-                    {signal.status}
-                  </span>
+
+                {/* Análise Técnica */}
+                <div style={{
+                  background: 'rgba(148, 163, 184, 0.05)',
+                  padding: '1rem',
+                  borderRadius: '0.5rem',
+                  border: '1px solid rgba(148, 163, 184, 0.1)'
+                }}>
+                  <p style={{ color: '#94A3B8', margin: '0 0 0.5rem 0', fontSize: '0.875rem', fontWeight: '500' }}>
+                    Análise Técnica:
+                  </p>
+                  <p style={{ color: '#F1F5F9', margin: 0, fontSize: '0.875rem', lineHeight: '1.5' }}>
+                    {signal.symbol === 'BTC/USDT' && 'Rompimento de resistência em $67,800 com volume crescente. RSI em 65, MACD bullish. Suporte forte em $67,200.'}
+                    {signal.symbol === 'ETH/USDT' && 'Padrão de reversão identificado. Divergência bearish no RSI. Resistência em $2,700, alvo de queda para $2,500.'}
+                    {signal.symbol === 'SOL/USDT' && 'Breakout confirmado acima de $185. Volume excepcional, momentum forte. Próxima resistência em $200.'}
+                  </p>
                 </div>
               </div>
             ))}

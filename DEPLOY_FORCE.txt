@@ -1,0 +1,4 @@
+Deploy forçado em: 2025-08-08 16:10
+Removendo credenciais de teste da interface de login
+Adicionando sistema completo de autenticação
+

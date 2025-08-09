@@ -37,6 +37,12 @@ function App() {
   // Estados para grupos Telegram
   const [telegramGroups, setTelegramGroups] = useState([])
   const [telegramValidated, setTelegramValidated] = useState(false)
+  
+  // Estados para autorização userbot
+  const [userbotAuthStep, setUserbotAuthStep] = useState('idle') // idle, phone, code, authorized
+  const [userbotPhone, setUserbotPhone] = useState('')
+  const [userbotCode, setUserbotCode] = useState('')
+  const [userbotSessionId, setUserbotSessionId] = useState('')
 
   // Verificar se já está logado
   useEffect(() => {
@@ -175,7 +181,89 @@ function App() {
     }
   }
 
-  // Função para desconectar do Telegram
+   // Função para iniciar autorização do userbot
+  const startUserbotAuth = () => {
+    setUserbotAuthStep('phone')
+    setUserbotPhone('')
+    setUserbotCode('')
+  }
+
+  // Função para enviar telefone e solicitar código
+  const sendPhoneForAuth = async () => {
+    if (!userbotPhone.trim()) {
+      alert('Digite seu número de telefone')
+      return
+    }
+
+    try {
+      const response = await fetch('https://nexocrypto-backend.onrender.com/api/userbot/start-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          uuid: currentUUID,
+          phone_number: userbotPhone
+        })
+      })
+
+      const data = await response.json()
+      
+      if (data.success) {
+        if (data.status === 'code_sent') {
+          setUserbotSessionId(data.session_id)
+          setUserbotAuthStep('code')
+          alert('Código de verificação enviado para seu telefone!')
+        } else if (data.status === 'authorized') {
+          setUserbotAuthStep('authorized')
+          loadTelegramGroups() // Recarrega grupos com dados reais
+          alert('Autorização bem-sucedida! Grupos reais carregados.')
+        }
+      } else {
+        alert(`Erro: ${data.error}`)
+      }
+    } catch (error) {
+      console.error('Erro ao enviar telefone:', error)
+      alert('Erro ao enviar telefone. Tente novamente.')
+    }
+  }
+
+  // Função para verificar código de autorização
+  const verifyAuthCode = async () => {
+    if (!userbotCode.trim()) {
+      alert('Digite o código de verificação')
+      return
+    }
+
+    try {
+      const response = await fetch('https://nexocrypto-backend.onrender.com/api/userbot/verify-code', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          uuid: currentUUID,
+          phone_number: userbotPhone,
+          code: userbotCode
+        })
+      })
+
+      const data = await response.json()
+      
+      if (data.success) {
+        setUserbotAuthStep('authorized')
+        loadTelegramGroups() // Recarrega grupos com dados reais
+        alert('Autorização bem-sucedida! Seus grupos reais foram carregados.')
+      } else {
+        alert(`Erro na verificação: ${data.error}`)
+      }
+    } catch (error) {
+      console.error('Erro ao verificar código:', error)
+      alert('Erro ao verificar código. Tente novamente.')
+    }
+  }
+
+  // Função para desconectar Telegramam
   const disconnectTelegram = async () => {
     if (!currentUUID) {
       alert('Nenhuma conexão ativa para desconectar')
@@ -1789,9 +1877,30 @@ function App() {
             border: '1px solid rgba(148, 163, 184, 0.1)',
             marginBottom: '1.5rem'
           }}>
-            <h3 style={{ color: '#F1F5F9', margin: '0 0 1.5rem 0', fontSize: '1.25rem', fontWeight: '600' }}>
-              📱 Grupos Telegram Conectados
-            </h3>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+              <h3 style={{ color: '#F1F5F9', margin: 0, fontSize: '1.25rem', fontWeight: '600' }}>
+                📱 Grupos Telegram Conectados
+              </h3>
+              {telegramValidationStatus === 'VALIDADO' && (
+                <button
+                  onClick={startUserbotAuth}
+                  style={{
+                    background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+                    color: 'white',
+                    border: 'none',
+                    padding: '0.75rem 1.5rem',
+                    borderRadius: '0.5rem',
+                    fontSize: '0.875rem',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)'
+                  }}
+                >
+                  🔗 Conectar Grupos Reais
+                </button>
+              )}
+            </div>
             
             <div style={{ display: 'grid', gap: '1rem' }}>
               {telegramGroups.length > 0 ? telegramGroups.map((group, index) => (
@@ -1877,6 +1986,178 @@ function App() {
               </button>
             )}
           </div>
+
+          {/* Modal de Autorização Userbot */}
+          {userbotAuthStep !== 'idle' && (
+            <div style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: 'rgba(0, 0, 0, 0.8)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 1000
+            }}>
+              <div style={{
+                background: 'rgba(30, 41, 59, 0.95)',
+                padding: '2rem',
+                borderRadius: '1rem',
+                border: '1px solid rgba(148, 163, 184, 0.2)',
+                backdropFilter: 'blur(10px)',
+                maxWidth: '400px',
+                width: '90%'
+              }}>
+                {userbotAuthStep === 'phone' && (
+                  <>
+                    <h3 style={{ color: '#F1F5F9', margin: '0 0 1rem 0', textAlign: 'center' }}>
+                      📱 Conectar Grupos Reais
+                    </h3>
+                    <p style={{ color: '#94A3B8', margin: '0 0 1.5rem 0', textAlign: 'center', fontSize: '0.875rem' }}>
+                      Digite seu número de telefone para autorizar o acesso aos seus grupos do Telegram
+                    </p>
+                    <input
+                      type="tel"
+                      placeholder="+55 11 99999-9999"
+                      value={userbotPhone}
+                      onChange={(e) => setUserbotPhone(e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '0.75rem',
+                        borderRadius: '0.5rem',
+                        border: '1px solid rgba(148, 163, 184, 0.3)',
+                        background: 'rgba(15, 23, 42, 0.8)',
+                        color: '#F1F5F9',
+                        fontSize: '1rem',
+                        marginBottom: '1.5rem'
+                      }}
+                    />
+                    <div style={{ display: 'flex', gap: '1rem' }}>
+                      <button
+                        onClick={() => setUserbotAuthStep('idle')}
+                        style={{
+                          flex: 1,
+                          padding: '0.75rem',
+                          borderRadius: '0.5rem',
+                          border: '1px solid rgba(148, 163, 184, 0.3)',
+                          background: 'transparent',
+                          color: '#94A3B8',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        Cancelar
+                      </button>
+                      <button
+                        onClick={sendPhoneForAuth}
+                        style={{
+                          flex: 1,
+                          padding: '0.75rem',
+                          borderRadius: '0.5rem',
+                          border: 'none',
+                          background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+                          color: 'white',
+                          cursor: 'pointer',
+                          fontWeight: '500'
+                        }}
+                      >
+                        Enviar Código
+                      </button>
+                    </div>
+                  </>
+                )}
+
+                {userbotAuthStep === 'code' && (
+                  <>
+                    <h3 style={{ color: '#F1F5F9', margin: '0 0 1rem 0', textAlign: 'center' }}>
+                      🔐 Código de Verificação
+                    </h3>
+                    <p style={{ color: '#94A3B8', margin: '0 0 1.5rem 0', textAlign: 'center', fontSize: '0.875rem' }}>
+                      Digite o código de verificação enviado para {userbotPhone}
+                    </p>
+                    <input
+                      type="text"
+                      placeholder="12345"
+                      value={userbotCode}
+                      onChange={(e) => setUserbotCode(e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '0.75rem',
+                        borderRadius: '0.5rem',
+                        border: '1px solid rgba(148, 163, 184, 0.3)',
+                        background: 'rgba(15, 23, 42, 0.8)',
+                        color: '#F1F5F9',
+                        fontSize: '1rem',
+                        marginBottom: '1.5rem',
+                        textAlign: 'center',
+                        letterSpacing: '0.2rem'
+                      }}
+                    />
+                    <div style={{ display: 'flex', gap: '1rem' }}>
+                      <button
+                        onClick={() => setUserbotAuthStep('phone')}
+                        style={{
+                          flex: 1,
+                          padding: '0.75rem',
+                          borderRadius: '0.5rem',
+                          border: '1px solid rgba(148, 163, 184, 0.3)',
+                          background: 'transparent',
+                          color: '#94A3B8',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        Voltar
+                      </button>
+                      <button
+                        onClick={verifyAuthCode}
+                        style={{
+                          flex: 1,
+                          padding: '0.75rem',
+                          borderRadius: '0.5rem',
+                          border: 'none',
+                          background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+                          color: 'white',
+                          cursor: 'pointer',
+                          fontWeight: '500'
+                        }}
+                      >
+                        Verificar
+                      </button>
+                    </div>
+                  </>
+                )}
+
+                {userbotAuthStep === 'authorized' && (
+                  <>
+                    <div style={{ textAlign: 'center' }}>
+                      <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>✅</div>
+                      <h3 style={{ color: '#10B981', margin: '0 0 1rem 0' }}>
+                        Autorização Bem-sucedida!
+                      </h3>
+                      <p style={{ color: '#94A3B8', margin: '0 0 1.5rem 0', fontSize: '0.875rem' }}>
+                        Seus grupos reais do Telegram foram carregados com sucesso.
+                      </p>
+                      <button
+                        onClick={() => setUserbotAuthStep('idle')}
+                        style={{
+                          padding: '0.75rem 2rem',
+                          borderRadius: '0.5rem',
+                          border: 'none',
+                          background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+                          color: 'white',
+                          cursor: 'pointer',
+                          fontWeight: '500'
+                        }}
+                      >
+                        Continuar
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Estatísticas em Tempo Real */}
           <div style={{

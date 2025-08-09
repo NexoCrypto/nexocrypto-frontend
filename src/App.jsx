@@ -204,7 +204,7 @@ function App() {
     }
 
     try {
-      const response = await fetch('https://nexocrypto-backend.onrender.com/api/userbot/start-session', {
+      const response = await fetch('https://nexocrypto-backend.onrender.com/api/telegram/start-userbot-session', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -225,7 +225,7 @@ function App() {
         } else if (data.status === 'authorized') {
           setUserbotAuthStep('authorized')
           loadTelegramGroups() // Recarrega grupos com dados reais
-          alert('Autorização bem-sucedida! Grupos reais carregados.')
+          alert(`✅ Grupos reais capturados com sucesso!\n\n📊 ${data.groups_count} grupos encontrados para seu telefone.\n\nOs grupos reais agora aparecem no sistema sem o indicador DEMO.`)
         }
       } else {
         // Mostrar mensagem explicativa em caso de erro

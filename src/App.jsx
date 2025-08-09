@@ -133,6 +133,87 @@ function App() {
     }
   }
 
+  // Função para iniciar sessão do userbot
+  const startUserbotSession = async (phoneNumber) => {
+    if (!currentUUID) {
+      alert('Nenhum UUID disponível')
+      return
+    }
+
+    try {
+      const response = await fetch('https://nexocrypto-backend.onrender.com/api/telegram/start-userbot-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          uuid: currentUUID,
+          phone_number: phoneNumber
+        })
+      })
+
+      const data = await response.json()
+      
+      if (data.success) {
+        if (data.status === 'code_sent') {
+          const code = prompt('Digite o código de verificação enviado para seu telefone:')
+          if (code) {
+            await verifyUserbotCode(phoneNumber, code)
+          }
+        } else if (data.status === 'authorized') {
+          setTelegramValidated(true)
+          setTelegramUsername(data.user.username || 'Usuário Telegram')
+          setTelegramGroups(data.groups || [])
+          alert('Conectado com sucesso! Grupos carregados.')
+        }
+      } else {
+        alert('Erro ao conectar: ' + (data.error || 'Erro desconhecido'))
+      }
+    } catch (error) {
+      console.error('Erro ao iniciar sessão userbot:', error)
+      alert('Erro ao conectar com Telegram')
+    }
+  }
+
+  // Função para verificar código do userbot
+  const verifyUserbotCode = async (phoneNumber, code) => {
+    try {
+      const response = await fetch('https://nexocrypto-backend.onrender.com/api/telegram/verify-userbot-code', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          uuid: currentUUID,
+          phone_number: phoneNumber,
+          code: code
+        })
+      })
+
+      const data = await response.json()
+      
+      if (data.success) {
+        setTelegramValidated(true)
+        setTelegramUsername(data.user.username || 'Usuário Telegram')
+        setTelegramGroups(data.groups || [])
+        alert('Conectado com sucesso! Grupos carregados.')
+      } else {
+        if (data.requires_password) {
+          const password = prompt('Digite sua senha de duas etapas:')
+          if (password) {
+            // Implementar verificação de senha se necessário
+            alert('Verificação de senha de duas etapas ainda não implementada')
+          }
+        } else {
+          alert('Erro na verificação: ' + (data.error || 'Código inválido'))
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao verificar código:', error)
+      alert('Erro ao verificar código')
+    }
+  }
+
   // Função para ativar/desativar monitoramento de grupo
   const toggleGroupMonitoring = async (groupId, isMonitored) => {
     if (!currentUUID) {
@@ -1874,6 +1955,31 @@ function App() {
                 }}
               >
                 🔄 Atualizar Grupos
+              </button>
+            )}
+
+            {!telegramValidated && (
+              <button 
+                onClick={() => {
+                  const phone = prompt('Digite seu número de telefone (com código do país, ex: +5511999999999):')
+                  if (phone) {
+                    startUserbotSession(phone)
+                  }
+                }}
+                style={{
+                  background: 'linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%)',
+                  color: 'white',
+                  border: 'none',
+                  padding: '0.75rem 1.5rem',
+                  borderRadius: '0.5rem',
+                  fontSize: '0.875rem',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  marginTop: '1rem',
+                  width: '100%'
+                }}
+              >
+                📱 Conectar Grupos Reais
               </button>
             )}
           </div>

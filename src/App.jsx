@@ -33,6 +33,10 @@ function App() {
   const [gems, setGems] = useState([])
   const [news, setNews] = useState([])
   const [loading, setLoading] = useState(false)
+  
+  // Estados para grupos Telegram
+  const [telegramGroups, setTelegramGroups] = useState([])
+  const [telegramValidated, setTelegramValidated] = useState(false)
 
   // Verificar se já está logado
   useEffect(() => {
@@ -87,15 +91,87 @@ function App() {
       
       if (data.success && data.validated) {
         setIsValidated(true)
+        setTelegramValidated(true)
         setTelegramUsername(data.username || 'Usuário Telegram')
         console.log('Validação confirmada para:', data.username)
+        
+        // Carrega grupos automaticamente após validação
+        loadTelegramGroups()
       } else {
         setIsValidated(false)
+        setTelegramValidated(false)
         setTelegramUsername('')
+        setTelegramGroups([])
         console.log('UUID não validado ainda')
       }
     } catch (error) {
       console.error('Erro ao verificar validação:', error)
+    }
+  }
+
+  // Função para carregar grupos Telegram
+  const loadTelegramGroups = async () => {
+    if (!currentUUID) {
+      console.log('Nenhum UUID para carregar grupos')
+      return
+    }
+
+    try {
+      const response = await fetch(`https://nexocrypto-backend.onrender.com/api/telegram/user-groups/${currentUUID}`)
+      const data = await response.json()
+      
+      if (data.success) {
+        setTelegramGroups(data.groups || [])
+        console.log('Grupos carregados:', data.groups?.length || 0)
+      } else {
+        console.error('Erro ao carregar grupos:', data.error)
+        setTelegramGroups([])
+      }
+    } catch (error) {
+      console.error('Erro ao carregar grupos:', error)
+      setTelegramGroups([])
+    }
+  }
+
+  // Função para ativar/desativar monitoramento de grupo
+  const toggleGroupMonitoring = async (groupId, isMonitored) => {
+    if (!currentUUID) {
+      alert('Nenhuma conexão ativa')
+      return
+    }
+
+    try {
+      const response = await fetch('https://nexocrypto-backend.onrender.com/api/telegram/toggle-group-monitoring', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          uuid: currentUUID,
+          group_id: groupId,
+          is_monitored: isMonitored
+        })
+      })
+
+      const data = await response.json()
+      
+      if (data.success) {
+        // Atualiza estado local
+        setTelegramGroups(prevGroups => 
+          prevGroups.map(group => 
+            group.id === groupId 
+              ? { ...group, is_monitored: isMonitored }
+              : group
+          )
+        )
+        
+        console.log(`Grupo ${groupId} ${isMonitored ? 'ativado' : 'desativado'} para monitoramento`)
+      } else {
+        alert('Erro ao alterar monitoramento: ' + (data.error || 'Erro desconhecido'))
+      }
+    } catch (error) {
+      console.error('Erro ao alterar monitoramento:', error)
+      alert('Erro ao alterar monitoramento do grupo')
     }
   }
 
@@ -1718,10 +1794,7 @@ function App() {
             </h3>
             
             <div style={{ display: 'grid', gap: '1rem' }}>
-              {[
-                { name: 'NexoCrypto Bot', status: 'Conectado', signals: 0, color: '#10B981', type: 'bot' },
-                { name: 'Aguardando grupos...', status: 'Pronto para conectar', signals: 0, color: '#94A3B8', type: 'waiting' }
-              ].map((group, index) => (
+              {telegramGroups.length > 0 ? telegramGroups.map((group, index) => (
                 <div key={index} style={{
                   background: 'rgba(148, 163, 184, 0.05)',
                   padding: '1rem',
@@ -1736,36 +1809,73 @@ function App() {
                       width: '12px',
                       height: '12px',
                       borderRadius: '50%',
-                      background: group.color,
-                      boxShadow: `0 0 8px ${group.color}50`
+                      background: group.is_monitored ? '#10B981' : '#94A3B8',
+                      boxShadow: `0 0 8px ${group.is_monitored ? '#10B981' : '#94A3B8'}50`
                     }}></div>
                     <div>
                       <p style={{ color: '#F1F5F9', margin: '0 0 0.25rem 0', fontWeight: '500' }}>{group.name}</p>
-                      <p style={{ color: '#94A3B8', margin: 0, fontSize: '0.875rem' }}>{group.status}</p>
+                      <p style={{ color: '#94A3B8', margin: 0, fontSize: '0.875rem' }}>
+                        {group.type} • {group.is_monitored ? 'Monitorando' : 'Disponível'}
+                      </p>
                     </div>
                   </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <p style={{ color: '#F1F5F9', margin: '0 0 0.25rem 0', fontWeight: '500' }}>{group.signals}</p>
-                    <p style={{ color: '#94A3B8', margin: 0, fontSize: '0.875rem' }}>sinais</p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    <div style={{ textAlign: 'right' }}>
+                      <p style={{ color: '#F1F5F9', margin: '0 0 0.25rem 0', fontWeight: '500' }}>{group.signals_count}</p>
+                      <p style={{ color: '#94A3B8', margin: 0, fontSize: '0.875rem' }}>sinais</p>
+                    </div>
+                    <button
+                      onClick={() => toggleGroupMonitoring(group.id, !group.is_monitored)}
+                      style={{
+                        background: group.is_monitored ? '#EF4444' : '#10B981',
+                        color: 'white',
+                        border: 'none',
+                        padding: '0.5rem 1rem',
+                        borderRadius: '0.375rem',
+                        fontSize: '0.75rem',
+                        fontWeight: '500',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease'
+                      }}
+                    >
+                      {group.is_monitored ? 'Parar' : 'Monitorar'}
+                    </button>
                   </div>
                 </div>
-              ))}
+              )) : (
+                <div style={{
+                  background: 'rgba(148, 163, 184, 0.05)',
+                  padding: '2rem',
+                  borderRadius: '0.5rem',
+                  border: '1px solid rgba(148, 163, 184, 0.1)',
+                  textAlign: 'center'
+                }}>
+                  <p style={{ color: '#94A3B8', margin: 0, fontSize: '0.875rem' }}>
+                    {telegramValidated ? 'Carregando grupos...' : 'Conecte seu Telegram para ver os grupos disponíveis'}
+                  </p>
+                </div>
+              )}
             </div>
 
-            <button style={{
-              background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
-              color: 'white',
-              border: 'none',
-              padding: '0.75rem 1.5rem',
-              borderRadius: '0.5rem',
-              fontSize: '0.875rem',
-              fontWeight: '500',
-              cursor: 'pointer',
-              marginTop: '1rem',
-              width: '100%'
-            }}>
-              + Adicionar Grupo
-            </button>
+            {telegramValidated && (
+              <button 
+                onClick={loadTelegramGroups}
+                style={{
+                  background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+                  color: 'white',
+                  border: 'none',
+                  padding: '0.75rem 1.5rem',
+                  borderRadius: '0.5rem',
+                  fontSize: '0.875rem',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  marginTop: '1rem',
+                  width: '100%'
+                }}
+              >
+                🔄 Atualizar Grupos
+              </button>
+            )}
           </div>
 
           {/* Estatísticas em Tempo Real */}

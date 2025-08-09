@@ -228,11 +228,14 @@ function App() {
           alert('Autorização bem-sucedida! Grupos reais carregados.')
         }
       } else {
-        alert(`Erro: ${data.error}`)
+        // Mostrar mensagem explicativa em caso de erro
+        alert(`⚠️ Conexão com grupos reais temporariamente indisponível.\n\nMotivo: ${data.error}\n\nVocê pode continuar usando os grupos DEMO para testar o sistema. Estamos trabalhando para resolver este problema.`)
+        setUserbotAuthStep('idle')
       }
     } catch (error) {
       console.error('Erro ao enviar telefone:', error)
-      alert('Erro ao enviar telefone. Tente novamente.')
+      alert('⚠️ Não foi possível conectar aos grupos reais no momento.\n\nVocê pode continuar usando os grupos DEMO para testar todas as funcionalidades do sistema.')
+      setUserbotAuthStep('idle')
     }
   }
 

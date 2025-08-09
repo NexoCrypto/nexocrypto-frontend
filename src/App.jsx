@@ -52,52 +52,107 @@ function App() {
   // Função para gerar novo UUID
   const generateNewUUID = async () => {
     try {
-      const response = await fetch('https://nexocrypto-backend.onrender.com/api/generate-uuid', {
+      const response = await fetch('https://nexocrypto-backend.onrender.com/api/telegram/generate-uuid', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
+        headers: {
+          'Content-Type': 'application/json'
+        }
       })
+      
       const data = await response.json()
-      if (data.uuid) {
+      
+      if (data.success) {
         setCurrentUUID(data.uuid)
         setIsValidated(false)
         setTelegramUsername('')
+        console.log('Novo UUID gerado:', data.uuid)
+      } else {
+        console.error('Erro ao gerar UUID:', data.error)
       }
     } catch (error) {
-      console.error('Erro ao gerar UUID:', error)
+      console.error('Erro na requisição:', error)
     }
   }
 
   // Função para verificar validação do Telegram
   const checkTelegramValidation = async () => {
-    if (!currentUUID) return
-    
+    if (!currentUUID) {
+      console.log('Nenhum UUID para verificar')
+      return
+    }
+
     try {
-      const response = await fetch(`https://nexocrypto-backend.onrender.com/api/check-validation/${currentUUID}`)
+      const response = await fetch(`https://nexocrypto-backend.onrender.com/api/telegram/check-validation/${currentUUID}`)
       const data = await response.json()
       
-      if (data.validated) {
+      if (data.success && data.validated) {
         setIsValidated(true)
-        setTelegramUsername(data.username || 'Usuário validado')
+        setTelegramUsername(data.username || 'Usuário Telegram')
+        console.log('Validação confirmada para:', data.username)
+      } else {
+        setIsValidated(false)
+        setTelegramUsername('')
+        console.log('UUID não validado ainda')
       }
     } catch (error) {
       console.error('Erro ao verificar validação:', error)
     }
   }
 
-  // Funções de autenticação avançada
-  const handleRegister = (e) => {
-    e.preventDefault()
-    if (registerForm.password !== registerForm.confirmPassword) {
-      alert('Senhas não coincidem!')
+  // Função para desconectar do Telegram
+  const disconnectTelegram = async () => {
+    if (!currentUUID) {
+      alert('Nenhuma conexão ativa para desconectar')
       return
     }
-    setVerificationStep('email')
-    alert('Código de verificação enviado para seu e-mail!')
+
+    const confirmDisconnect = window.confirm(
+      'Tem certeza que deseja desconectar do Telegram?\n\n' +
+      'Isso irá:\n' +
+      '• Desativar o Auto Trading\n' +
+      '• Parar o recebimento de sinais\n' +
+      '• Remover a validação atual\n\n' +
+      'Você precisará validar novamente para reconectar.'
+    )
+
+    if (!confirmDisconnect) {
+      return
+    }
+
+    try {
+      const response = await fetch('https://nexocrypto-backend.onrender.com/api/telegram/disconnect', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          uuid: currentUUID
+        })
+      })
+      
+      const data = await response.json()
+      
+      if (data.success) {
+        // Reset do estado
+        setCurrentUUID('')
+        setIsValidated(false)
+        setTelegramUsername('')
+        
+        alert('Desconectado do Telegram com sucesso!\n\nPara reconectar, gere um novo UUID e valide novamente.')
+        
+        // Gera novo UUID automaticamente
+        generateNewUUID()
+      } else {
+        alert('Erro ao desconectar: ' + (data.error || 'Erro desconhecido'))
+      }
+    } catch (error) {
+      console.error('Erro ao desconectar:', error)
+      alert('Erro de conexão ao tentar desconectar')
+    }
   }
 
-  const handleForgotPassword = (e) => {
-    e.preventDefault()
-    alert('Link de recuperação enviado para seu e-mail!')
+  const handleBackToLogin = () => {
+    setShowRegister(false)
     setShowForgotPassword(false)
   }
 
@@ -1519,6 +1574,24 @@ function App() {
               >
                 Verificar Validação
               </button>
+
+              {isValidated && (
+                <button
+                  onClick={disconnectTelegram}
+                  style={{
+                    padding: '0.75rem 1.5rem',
+                    borderRadius: '0.5rem',
+                    border: 'none',
+                    background: 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)',
+                    color: 'white',
+                    fontSize: '0.875rem',
+                    fontWeight: '500',
+                    cursor: 'pointer'
+                  }}
+                >
+                  🔌 Desconectar
+                </button>
+              )}
             </div>
 
             {/* Status da Validação */}

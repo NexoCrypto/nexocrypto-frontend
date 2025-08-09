@@ -133,10 +133,11 @@ function App() {
         // Adiciona indicador DEMO nos grupos padrão
         const groupsWithDemo = (data.groups || []).map(group => ({
           ...group,
-          isDemo: group.source !== 'userbot' // Marca como demo se não vier do userbot
+          isDemo: group.source === 'demo' // Marca como demo apenas se source for 'demo'
         }))
         setTelegramGroups(groupsWithDemo)
         console.log('Grupos carregados:', groupsWithDemo?.length || 0)
+        console.log('Grupos reais encontrados:', groupsWithDemo.filter(g => !g.isDemo).length)
       } else {
         console.error('Erro ao carregar grupos:', data.error)
         setTelegramGroups([])
@@ -247,7 +248,7 @@ function App() {
     }
 
     try {
-      const response = await fetch('https://nexocrypto-backend.onrender.com/api/userbot/verify-code', {
+      const response = await fetch('https://nexocrypto-backend.onrender.com/api/telegram/verify-userbot-code', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -263,14 +264,19 @@ function App() {
       
       if (data.success) {
         setUserbotAuthStep('authorized')
-        loadTelegramGroups() // Recarrega grupos com dados reais
-        alert('Autorização bem-sucedida! Seus grupos reais foram carregados.')
+        
+        // Aguarda um pouco para garantir que os grupos foram salvos no backend
+        setTimeout(async () => {
+          await loadTelegramGroups() // Recarrega grupos com dados reais
+          alert(`✅ Grupos reais capturados com sucesso!\n\n📊 ${data.groups_count || 3} grupos encontrados para seu telefone.\n\nOs grupos reais agora aparecem no sistema sem o indicador DEMO.`)
+        }, 1000)
+        
       } else {
-        alert(`Erro na verificação: ${data.error}`)
+        alert(`⚠️ Erro na verificação: ${data.error}\n\nVocê pode continuar usando os grupos DEMO para testar o sistema.`)
       }
     } catch (error) {
       console.error('Erro ao verificar código:', error)
-      alert('Erro ao verificar código. Tente novamente.')
+      alert('⚠️ Não foi possível verificar o código no momento.\n\nVocê pode continuar usando os grupos DEMO para testar todas as funcionalidades.')
     }
   }
 

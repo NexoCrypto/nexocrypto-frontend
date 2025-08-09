@@ -749,7 +749,7 @@ function App() {
                   transition: 'all 0.2s ease',
                   outline: 'none'
                 }}
-                onFocus={(e) => e.target.style.borderColor = '#64748B'}
+                onFocus={(e) => e.target.style.borderColor = '#10B981'}
                 onBlur={(e) => e.target.style.borderColor = '#475569'}
                 required
               />
@@ -774,7 +774,7 @@ function App() {
                   transition: 'all 0.2s ease',
                   outline: 'none'
                 }}
-                onFocus={(e) => e.target.style.borderColor = '#64748B'}
+                onFocus={(e) => e.target.style.borderColor = '#10B981'}
                 onBlur={(e) => e.target.style.borderColor = '#475569'}
                 required
               />

@@ -10,6 +10,7 @@ function App() {
   const [currentUUID, setCurrentUUID] = useState('')
   const [telegramUsername, setTelegramUsername] = useState('')
   const [isValidated, setIsValidated] = useState(false)
+  const [telegramValidationStatus, setTelegramValidationStatus] = useState('NÃO VALIDADO')
   const [activeTab, setActiveTab] = useState('dashboard')
   
   // Estados para autenticação avançada
@@ -98,6 +99,7 @@ function App() {
       if (data.success && data.validated) {
         setIsValidated(true)
         setTelegramValidated(true)
+        setTelegramValidationStatus('VALIDADO')
         setTelegramUsername(data.username || 'Usuário Telegram')
         console.log('Validação confirmada para:', data.username)
         
@@ -106,6 +108,7 @@ function App() {
       } else {
         setIsValidated(false)
         setTelegramValidated(false)
+        setTelegramValidationStatus('NÃO VALIDADO')
         setTelegramUsername('')
         setTelegramGroups([])
         console.log('UUID não validado ainda')

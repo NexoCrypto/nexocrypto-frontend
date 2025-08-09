@@ -130,8 +130,13 @@ function App() {
       const data = await response.json()
       
       if (data.success) {
-        setTelegramGroups(data.groups || [])
-        console.log('Grupos carregados:', data.groups?.length || 0)
+        // Adiciona indicador DEMO nos grupos padrão
+        const groupsWithDemo = (data.groups || []).map(group => ({
+          ...group,
+          isDemo: group.source !== 'userbot' // Marca como demo se não vier do userbot
+        }))
+        setTelegramGroups(groupsWithDemo)
+        console.log('Grupos carregados:', groupsWithDemo?.length || 0)
       } else {
         console.error('Erro ao carregar grupos:', data.error)
         setTelegramGroups([])
@@ -1925,7 +1930,24 @@ function App() {
                       boxShadow: `0 0 8px ${group.is_monitored ? '#10B981' : '#94A3B8'}50`
                     }}></div>
                     <div>
-                      <p style={{ color: '#F1F5F9', margin: '0 0 0.25rem 0', fontWeight: '500' }}>{group.name}</p>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+                        <p style={{ color: '#F1F5F9', margin: 0, fontWeight: '500' }}>{group.name}</p>
+                        {(group.isDemo || group.source !== 'userbot') && (
+                          <span style={{
+                            background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
+                            color: 'white',
+                            fontSize: '0.625rem',
+                            fontWeight: '600',
+                            padding: '0.125rem 0.375rem',
+                            borderRadius: '0.25rem',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.05em',
+                            boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)'
+                          }}>
+                            DEMO
+                          </span>
+                        )}
+                      </div>
                       <p style={{ color: '#94A3B8', margin: 0, fontSize: '0.875rem' }}>
                         {group.type} • {group.is_monitored ? 'Monitorando' : 'Disponível'}
                       </p>
@@ -1962,8 +1984,26 @@ function App() {
                   border: '1px solid rgba(148, 163, 184, 0.1)',
                   textAlign: 'center'
                 }}>
-                  <p style={{ color: '#94A3B8', margin: 0, fontSize: '0.875rem' }}>
-                    {telegramValidated ? 'Carregando grupos...' : 'Conecte seu Telegram para ver os grupos disponíveis'}
+                  <div style={{ marginBottom: '1rem' }}>
+                    <span style={{
+                      background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
+                      color: 'white',
+                      fontSize: '0.75rem',
+                      fontWeight: '600',
+                      padding: '0.25rem 0.75rem',
+                      borderRadius: '0.375rem',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em',
+                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+                    }}>
+                      📋 GRUPOS DEMO
+                    </span>
+                  </div>
+                  <p style={{ color: '#94A3B8', margin: 0, fontSize: '0.875rem', lineHeight: '1.5' }}>
+                    {telegramValidated ? 
+                      'Conecte seus grupos reais clicando em "Conectar Grupos Reais" para monitorar sinais dos grupos que você participa.' : 
+                      'Valide seu Telegram primeiro para ver grupos demo e depois conecte seus grupos reais.'
+                    }
                   </p>
                 </div>
               )}

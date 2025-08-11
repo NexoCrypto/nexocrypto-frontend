@@ -133,7 +133,7 @@ function App() {
         // Adiciona indicador DEMO nos grupos padrão
         const groupsWithDemo = (data.groups || []).map(group => ({
           ...group,
-          isDemo: group.source === 'demo' // Marca como demo apenas se source for 'demo'
+          isDemo: group.source !== 'userbot_real' // Marca como demo se NÃO for userbot_real
         }))
         setTelegramGroups(groupsWithDemo)
         console.log('Grupos carregados:', groupsWithDemo?.length || 0)

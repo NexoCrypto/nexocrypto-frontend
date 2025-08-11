@@ -60,6 +60,29 @@ function App() {
     }
   }, [isAuthenticated])
 
+  // Efeito para verificar validação quando UUID é definido
+  useEffect(() => {
+    if (currentUUID) {
+      // Recupera estado de validação do localStorage
+      const savedValidationStatus = localStorage.getItem(`telegram_validation_${currentUUID}`)
+      const savedUsername = localStorage.getItem(`telegram_username_${currentUUID}`)
+      
+      if (savedValidationStatus === 'VALIDADO') {
+        setIsValidated(true)
+        setTelegramValidated(true)
+        setTelegramValidationStatus('VALIDADO')
+        setTelegramUsername(savedUsername || 'Usuário Telegram')
+        console.log('Estado de validação recuperado do localStorage')
+        
+        // Carrega grupos automaticamente
+        loadTelegramGroups()
+      } else {
+        // Verifica validação no backend
+        checkTelegramValidation()
+      }
+    }
+  }, [currentUUID])
+
   // Função para gerar novo UUID
   const generateNewUUID = async () => {
     try {
@@ -101,6 +124,11 @@ function App() {
         setTelegramValidated(true)
         setTelegramValidationStatus('VALIDADO')
         setTelegramUsername(data.username || 'Usuário Telegram')
+        
+        // Salva estado no localStorage
+        localStorage.setItem(`telegram_validation_${currentUUID}`, 'VALIDADO')
+        localStorage.setItem(`telegram_username_${currentUUID}`, data.username || 'Usuário Telegram')
+        
         console.log('Validação confirmada para:', data.username)
         
         // Carrega grupos automaticamente após validação
@@ -111,6 +139,11 @@ function App() {
         setTelegramValidationStatus('NÃO VALIDADO')
         setTelegramUsername('')
         setTelegramGroups([])
+        
+        // Remove do localStorage se não validado
+        localStorage.removeItem(`telegram_validation_${currentUUID}`)
+        localStorage.removeItem(`telegram_username_${currentUUID}`)
+        
         console.log('UUID não validado ainda')
       }
     } catch (error) {
@@ -265,6 +298,16 @@ function App() {
       if (data.success) {
         setUserbotAuthStep('authorized')
         
+        // Atualiza estado de validação
+        setIsValidated(true)
+        setTelegramValidated(true)
+        setTelegramValidationStatus('VALIDADO')
+        setTelegramUsername('Usuário Telegram')
+        
+        // Salva estado no localStorage
+        localStorage.setItem(`telegram_validation_${currentUUID}`, 'VALIDADO')
+        localStorage.setItem(`telegram_username_${currentUUID}`, 'Usuário Telegram')
+        
         // Aguarda um pouco para garantir que os grupos foram salvos no backend
         setTimeout(async () => {
           await loadTelegramGroups() // Recarrega grupos com dados reais
@@ -317,7 +360,14 @@ function App() {
         // Reset do estado
         setCurrentUUID('')
         setIsValidated(false)
+        setTelegramValidated(false)
+        setTelegramValidationStatus('NÃO VALIDADO')
         setTelegramUsername('')
+        setTelegramGroups([])
+        
+        // Limpa localStorage
+        localStorage.removeItem(`telegram_validation_${currentUUID}`)
+        localStorage.removeItem(`telegram_username_${currentUUID}`)
         
         alert('Desconectado do Telegram com sucesso!\n\nPara reconectar, gere um novo UUID e valide novamente.')
         

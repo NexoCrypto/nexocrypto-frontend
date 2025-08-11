@@ -1,0 +1,8 @@
+CACHE BUSTER - FORCE VERCEL REBUILD
+Timestamp: 2025-08-11 15:05:00
+Build ID: FORCE_REBUILD_FINAL
+Purpose: Force complete cache invalidation and rebuild
+
+This file forces Vercel to detect changes and rebuild from scratch.
+All frontend changes should be applied after this commit.
+

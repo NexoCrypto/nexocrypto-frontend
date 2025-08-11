@@ -45,6 +45,12 @@ function App() {
   const [userbotCode, setUserbotCode] = useState('')
   const [userbotSessionId, setUserbotSessionId] = useState('')
 
+  // Estados para seleção de grupos
+  const [showGroupSelection, setShowGroupSelection] = useState(false)
+  const [availableGroups, setAvailableGroups] = useState([])
+  const [selectedGroups, setSelectedGroups] = useState([])
+  const [loadingGroups, setLoadingGroups] = useState(false)
+
   // Verificar se já está logado
   useEffect(() => {
     const token = localStorage.getItem('nexocrypto_token')
@@ -319,11 +325,10 @@ function App() {
         localStorage.setItem(`telegram_validation_${currentUUID}`, 'VALIDADO')
         localStorage.setItem(`telegram_username_${currentUUID}`, 'Usuário Telegram')
         
-        // Aguarda um pouco para garantir que os grupos foram salvos no backend
-        setTimeout(async () => {
-          await loadTelegramGroups() // Recarrega grupos com dados reais
-          alert(`✅ Grupos reais capturados com sucesso!\n\n📊 ${data.groups_count || 3} grupos encontrados para seu telefone.\n\nOs grupos reais agora aparecem no sistema sem o indicador DEMO.`)
-        }, 1000)
+        // Abre modal de seleção de grupos
+        setUserbotAuthStep('authorized')
+        await loadAvailableGroups()
+        setShowGroupSelection(true)
         
       } else {
         alert(`⚠️ Erro na verificação: ${data.error}\n\nVocê pode continuar usando os grupos DEMO para testar o sistema.`)
@@ -331,6 +336,76 @@ function App() {
     } catch (error) {
       console.error('Erro ao verificar código:', error)
       alert('⚠️ Não foi possível verificar o código no momento.\n\nVocê pode continuar usando os grupos DEMO para testar todas as funcionalidades.')
+    }
+  }
+
+  // Função para carregar grupos disponíveis
+  const loadAvailableGroups = async () => {
+    if (!currentUUID) return
+    
+    setLoadingGroups(true)
+    try {
+      const response = await fetch(`https://nexocrypto-backend.onrender.com/api/telegram/available-groups/${currentUUID}`)
+      const data = await response.json()
+      
+      if (data.success) {
+        setAvailableGroups(data.groups)
+        setSelectedGroups([])
+        console.log('Grupos disponíveis carregados:', data.groups.length)
+      } else {
+        alert('Erro ao carregar grupos: ' + data.error)
+      }
+    } catch (error) {
+      console.error('Erro ao carregar grupos:', error)
+      alert('Erro ao carregar grupos disponíveis')
+    } finally {
+      setLoadingGroups(false)
+    }
+  }
+
+  // Função para alternar seleção de grupo
+  const toggleGroupSelection = (groupId) => {
+    setSelectedGroups(prev => {
+      if (prev.includes(groupId)) {
+        return prev.filter(id => id !== groupId)
+      } else if (prev.length < 5) {
+        return [...prev, groupId]
+      }
+      return prev
+    })
+  }
+
+  // Função para confirmar seleção de grupos
+  const confirmGroupSelection = async () => {
+    if (selectedGroups.length !== 5) {
+      alert('Você deve selecionar exatamente 5 grupos')
+      return
+    }
+
+    try {
+      const response = await fetch('https://nexocrypto-backend.onrender.com/api/telegram/select-groups', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          uuid: currentUUID,
+          selected_groups: selectedGroups
+        })
+      })
+
+      const data = await response.json()
+      
+      if (data.success) {
+        setShowGroupSelection(false)
+        await loadTelegramGroups() // Recarrega grupos selecionados
+        alert(`✅ Grupos selecionados com sucesso!\n\n📊 ${selectedGroups.length} grupos configurados para monitoramento.\n\nOs grupos selecionados agora aparecem com badge REAL.`)
+      } else {
+        alert('Erro ao salvar seleção: ' + data.error)
+      }
+    } catch (error) {
+      console.error('Erro ao confirmar seleção:', error)
+      alert('Erro ao salvar grupos selecionados')
     }
   }
 
@@ -2003,7 +2078,7 @@ function App() {
                     <div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
                         <p style={{ color: '#F1F5F9', margin: 0, fontWeight: '500' }}>{group.name}</p>
-                        {(group.isDemo || group.source !== 'userbot') && (
+                        {group.isDemo || group.source !== 'userbot_real' ? (
                           <span style={{
                             background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
                             color: 'white',
@@ -2016,6 +2091,20 @@ function App() {
                             boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)'
                           }}>
                             DEMO
+                          </span>
+                        ) : (
+                          <span style={{
+                            background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+                            color: 'white',
+                            fontSize: '0.625rem',
+                            fontWeight: '600',
+                            padding: '0.125rem 0.375rem',
+                            borderRadius: '0.25rem',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.05em',
+                            boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)'
+                          }}>
+                            REAL
                           </span>
                         )}
                       </div>
@@ -3009,6 +3098,158 @@ function App() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Seleção de Grupos */}
+      {showGroupSelection && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            backgroundColor: '#1E293B',
+            borderRadius: '1rem',
+            padding: '2rem',
+            maxWidth: '600px',
+            width: '90%',
+            maxHeight: '80vh',
+            overflow: 'auto',
+            border: '1px solid #334155'
+          }}>
+            <div style={{ marginBottom: '1.5rem' }}>
+              <h3 style={{ 
+                color: '#F1F5F9', 
+                margin: 0, 
+                fontSize: '1.5rem', 
+                fontWeight: '600',
+                marginBottom: '0.5rem'
+              }}>
+                📋 Selecionar Grupos para Monitoramento
+              </h3>
+              <p style={{ 
+                color: '#94A3B8', 
+                margin: 0, 
+                fontSize: '0.9rem' 
+              }}>
+                Escolha exatamente 5 grupos dos seus grupos reais do Telegram para monitoramento de sinais.
+              </p>
+              <div style={{
+                marginTop: '1rem',
+                padding: '0.75rem',
+                backgroundColor: '#0F172A',
+                borderRadius: '0.5rem',
+                border: '1px solid #334155'
+              }}>
+                <span style={{ color: '#10B981', fontWeight: '600' }}>
+                  {selectedGroups.length}/5 grupos selecionados
+                </span>
+              </div>
+            </div>
+
+            {loadingGroups ? (
+              <div style={{ textAlign: 'center', padding: '2rem' }}>
+                <div style={{ color: '#94A3B8' }}>Carregando grupos disponíveis...</div>
+              </div>
+            ) : (
+              <div style={{ marginBottom: '1.5rem' }}>
+                {availableGroups.map((group) => (
+                  <div
+                    key={group.id}
+                    onClick={() => toggleGroupSelection(group.id)}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      padding: '1rem',
+                      marginBottom: '0.5rem',
+                      backgroundColor: selectedGroups.includes(group.id) ? '#065F46' : '#0F172A',
+                      border: `1px solid ${selectedGroups.includes(group.id) ? '#10B981' : '#334155'}`,
+                      borderRadius: '0.5rem',
+                      cursor: selectedGroups.length < 5 || selectedGroups.includes(group.id) ? 'pointer' : 'not-allowed',
+                      opacity: selectedGroups.length >= 5 && !selectedGroups.includes(group.id) ? 0.5 : 1,
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    <div style={{
+                      width: '20px',
+                      height: '20px',
+                      borderRadius: '4px',
+                      border: `2px solid ${selectedGroups.includes(group.id) ? '#10B981' : '#64748B'}`,
+                      backgroundColor: selectedGroups.includes(group.id) ? '#10B981' : 'transparent',
+                      marginRight: '1rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
+                      {selectedGroups.includes(group.id) && (
+                        <span style={{ color: 'white', fontSize: '12px' }}>✓</span>
+                      )}
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ 
+                        color: '#F1F5F9', 
+                        fontWeight: '500',
+                        marginBottom: '0.25rem'
+                      }}>
+                        {group.name}
+                      </div>
+                      <div style={{ 
+                        color: '#94A3B8', 
+                        fontSize: '0.8rem' 
+                      }}>
+                        {group.type} • {group.members || 0} membros
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div style={{ 
+              display: 'flex', 
+              gap: '1rem', 
+              justifyContent: 'flex-end' 
+            }}>
+              <button
+                onClick={() => setShowGroupSelection(false)}
+                style={{
+                  padding: '0.75rem 1.5rem',
+                  borderRadius: '0.5rem',
+                  border: '1px solid #64748B',
+                  backgroundColor: 'transparent',
+                  color: '#94A3B8',
+                  fontWeight: '500',
+                  cursor: 'pointer'
+                }}
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={confirmGroupSelection}
+                disabled={selectedGroups.length !== 5}
+                style={{
+                  padding: '0.75rem 1.5rem',
+                  borderRadius: '0.5rem',
+                  border: 'none',
+                  backgroundColor: selectedGroups.length === 5 ? '#10B981' : '#64748B',
+                  color: 'white',
+                  fontWeight: '500',
+                  cursor: selectedGroups.length === 5 ? 'pointer' : 'not-allowed',
+                  opacity: selectedGroups.length === 5 ? 1 : 0.6
+                }}
+              >
+                Confirmar Seleção
+              </button>
+            </div>
           </div>
         </div>
       )}

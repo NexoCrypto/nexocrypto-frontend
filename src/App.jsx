@@ -56,7 +56,14 @@ function App() {
   // Efeito para gerar UUID quando autenticado
   useEffect(() => {
     if (isAuthenticated && !currentUUID) {
-      generateNewUUID()
+      // Primeiro tenta recuperar UUID salvo
+      const savedUUID = localStorage.getItem('nexocrypto_current_uuid')
+      if (savedUUID) {
+        setCurrentUUID(savedUUID)
+        console.log('UUID recuperado do localStorage:', savedUUID)
+      } else {
+        generateNewUUID()
+      }
     }
   }, [isAuthenticated])
 
@@ -99,6 +106,10 @@ function App() {
         setCurrentUUID(data.uuid)
         setIsValidated(false)
         setTelegramUsername('')
+        
+        // Salva UUID no localStorage
+        localStorage.setItem('nexocrypto_current_uuid', data.uuid)
+        
         console.log('Novo UUID gerado:', data.uuid)
       } else {
         console.error('Erro ao gerar UUID:', data.error)
@@ -368,6 +379,7 @@ function App() {
         // Limpa localStorage
         localStorage.removeItem(`telegram_validation_${currentUUID}`)
         localStorage.removeItem(`telegram_username_${currentUUID}`)
+        localStorage.removeItem('nexocrypto_current_uuid')
         
         alert('Desconectado do Telegram com sucesso!\n\nPara reconectar, gere um novo UUID e valide novamente.')
         

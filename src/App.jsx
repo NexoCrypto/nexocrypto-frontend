@@ -264,6 +264,27 @@ function App() {
     console.log('📱 Iniciando validação de telefone:', userbotPhone)
 
     try {
+      // Primeiro, validar se o telefone está registrado no bot
+      const validationResponse = await fetch('https://nexocrypto-backend.onrender.com/api/telegram/validate-phone-with-bot', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          uuid: currentUUID,
+          phone_number: userbotPhone
+        })
+      })
+
+      const validationData = await validationResponse.json()
+      console.log('📥 Resposta da validação:', validationData)
+
+      if (!validationData.success) {
+        alert('❌ Telefone não encontrado\n\nEste número não está registrado em nosso sistema. Verifique se você já validou via bot @nexocrypto_trading_bot e tente novamente.')
+        return
+      }
+
+      // Se validação passou, iniciar sessão userbot
       const response = await fetch('https://nexocrypto-backend.onrender.com/api/telegram/start-userbot-session', {
         method: 'POST',
         headers: {
@@ -3313,7 +3334,7 @@ function App() {
             fontSize: '0.75rem',
             fontWeight: '500'
           }}>
-            v1.2.2
+            v1.2.3
           </span>
         </div>
       )}

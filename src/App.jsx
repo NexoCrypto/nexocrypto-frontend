@@ -298,6 +298,7 @@ function App() {
     }
 
     try {
+      console.log('🔄 Iniciando verificação de código...')
       const response = await fetch('https://nexocrypto-backend.onrender.com/api/telegram/verify-userbot-code', {
         method: 'POST',
         headers: {
@@ -311,8 +312,10 @@ function App() {
       })
 
       const data = await response.json()
+      console.log('📥 Resposta da verificação:', data)
       
       if (data.success) {
+        console.log('✅ Verificação bem-sucedida, atualizando estado...')
         setUserbotAuthStep('authorized')
         
         // Atualiza estado de validação
@@ -325,38 +328,50 @@ function App() {
         localStorage.setItem(`telegram_validation_${currentUUID}`, 'VALIDADO')
         localStorage.setItem(`telegram_username_${currentUUID}`, 'Usuário Telegram')
         
+        console.log('🔄 Carregando grupos disponíveis...')
         // Abre modal de seleção de grupos
-        setUserbotAuthStep('authorized')
         await loadAvailableGroups()
+        console.log('📋 Abrindo modal de seleção...')
         setShowGroupSelection(true)
         
       } else {
+        console.log('❌ Erro na verificação:', data.error)
         alert(`⚠️ Erro na verificação: ${data.error}\n\nVocê pode continuar usando os grupos DEMO para testar o sistema.`)
       }
     } catch (error) {
-      console.error('Erro ao verificar código:', error)
+      console.error('❌ Erro ao verificar código:', error)
       alert('⚠️ Não foi possível verificar o código no momento.\n\nVocê pode continuar usando os grupos DEMO para testar todas as funcionalidades.')
     }
   }
 
   // Função para carregar grupos disponíveis
   const loadAvailableGroups = async () => {
-    if (!currentUUID) return
+    if (!currentUUID) {
+      console.log('❌ UUID não encontrado para carregar grupos')
+      return
+    }
     
+    console.log('🔄 Carregando grupos disponíveis para UUID:', currentUUID)
     setLoadingGroups(true)
     try {
-      const response = await fetch(`https://nexocrypto-backend.onrender.com/api/telegram/available-groups/${currentUUID}`)
+      const url = `https://nexocrypto-backend.onrender.com/api/telegram/available-groups/${currentUUID}`
+      console.log('📡 Fazendo requisição para:', url)
+      
+      const response = await fetch(url)
       const data = await response.json()
+      
+      console.log('📥 Resposta dos grupos disponíveis:', data)
       
       if (data.success) {
         setAvailableGroups(data.groups)
         setSelectedGroups([])
-        console.log('Grupos disponíveis carregados:', data.groups.length)
+        console.log('✅ Grupos disponíveis carregados:', data.groups.length)
       } else {
+        console.log('❌ Erro ao carregar grupos:', data.error)
         alert('Erro ao carregar grupos: ' + data.error)
       }
     } catch (error) {
-      console.error('Erro ao carregar grupos:', error)
+      console.error('❌ Erro ao carregar grupos:', error)
       alert('Erro ao carregar grupos disponíveis')
     } finally {
       setLoadingGroups(false)

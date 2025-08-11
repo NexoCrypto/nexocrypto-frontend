@@ -3268,6 +3268,29 @@ function App() {
           </div>
         </div>
       )}
+
+      {/* Rodapé com versão */}
+      {isAuthenticated && (
+        <div style={{
+          position: 'fixed',
+          bottom: '1rem',
+          right: '1rem',
+          background: 'rgba(15, 23, 42, 0.9)',
+          padding: '0.5rem 1rem',
+          borderRadius: '0.5rem',
+          border: '1px solid rgba(148, 163, 184, 0.2)',
+          backdropFilter: 'blur(10px)',
+          zIndex: 1000
+        }}>
+          <span style={{
+            color: '#64748B',
+            fontSize: '0.75rem',
+            fontWeight: '500'
+          }}>
+            v1.2.1
+          </span>
+        </div>
+      )}
     </div>
   )
 }

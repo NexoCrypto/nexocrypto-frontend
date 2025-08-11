@@ -254,6 +254,15 @@ function App() {
       return
     }
 
+    // Validação de telefone fake
+    const phoneDigits = userbotPhone.replace(/\D/g, '')
+    if (phoneDigits === '1111111111' || phoneDigits === '11111111111' || /^(\d)\1+$/.test(phoneDigits)) {
+      alert('❌ Telefone não encontrado\n\nEste número não está registrado em nosso sistema. Verifique se o número está correto e tente novamente.')
+      return
+    }
+
+    console.log('📱 Iniciando validação de telefone:', userbotPhone)
+
     try {
       const response = await fetch('https://nexocrypto-backend.onrender.com/api/telegram/start-userbot-session', {
         method: 'POST',
@@ -267,25 +276,42 @@ function App() {
       })
 
       const data = await response.json()
+      console.log('📥 Resposta do backend:', data)
       
       if (data.success) {
         if (data.status === 'code_sent') {
           setUserbotSessionId(data.session_id)
           setUserbotAuthStep('code')
-          alert('Código de verificação enviado para seu telefone!')
+          console.log('✅ Código enviado, mudando para step code')
+          alert('📱 Código de verificação enviado!\n\nVerifique seu telefone e digite o código recebido.')
         } else if (data.status === 'authorized') {
+          console.log('✅ Já autorizado, carregando grupos...')
           setUserbotAuthStep('authorized')
-          loadTelegramGroups() // Recarrega grupos com dados reais
-          alert(`✅ Grupos reais capturados com sucesso!\n\n📊 ${data.groups_count} grupos encontrados para seu telefone.\n\nOs grupos reais agora aparecem no sistema sem o indicador DEMO.`)
+          
+          // Atualiza estado de validação
+          setIsValidated(true)
+          setTelegramValidated(true)
+          setTelegramValidationStatus('VALIDADO')
+          setTelegramUsername('Usuário Telegram')
+          
+          // Salva estado no localStorage
+          localStorage.setItem(`telegram_validation_${currentUUID}`, 'VALIDADO')
+          localStorage.setItem(`telegram_username_${currentUUID}`, 'Usuário Telegram')
+          
+          // Carrega grupos e abre modal
+          await loadAvailableGroups()
+          setShowGroupSelection(true)
+          
+          alert(`✅ Grupos reais capturados com sucesso!\n\n📊 ${data.groups_count || 'Vários'} grupos encontrados.\n\nSelecione 5 grupos para monitoramento.`)
         }
       } else {
-        // Mostrar mensagem explicativa em caso de erro
-        alert(`⚠️ Conexão com grupos reais temporariamente indisponível.\n\nMotivo: ${data.error}\n\nVocê pode continuar usando os grupos DEMO para testar o sistema. Estamos trabalhando para resolver este problema.`)
+        console.log('❌ Erro na validação:', data.error)
+        alert(`⚠️ Erro na validação: ${data.error}\n\nVerifique se o número está correto e tente novamente.`)
         setUserbotAuthStep('idle')
       }
     } catch (error) {
-      console.error('Erro ao enviar telefone:', error)
-      alert('⚠️ Não foi possível conectar aos grupos reais no momento.\n\nVocê pode continuar usando os grupos DEMO para testar todas as funcionalidades do sistema.')
+      console.error('❌ Erro ao enviar telefone:', error)
+      alert('⚠️ Erro de conexão.\n\nVerifique sua internet e tente novamente.')
       setUserbotAuthStep('idle')
     }
   }
@@ -3287,7 +3313,7 @@ function App() {
             fontSize: '0.75rem',
             fontWeight: '500'
           }}>
-            v1.2.1
+            v1.2.2
           </span>
         </div>
       )}
